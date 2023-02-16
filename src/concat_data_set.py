@@ -51,12 +51,6 @@ class ConcatDataSet(Dataset):
         
         return X, y
 
-    def standardize(self, x):
-        return (x - self.min) / (self.max - self.min)
-    
-    def undo_standardization(self, x):
-        return x * (self.max - self.min) + self.min
-
     def init_dataset(self):
         if not self.should_test_the_new_data_set:
             for i in tqdm.tqdm(range(self.num_of_data_sets), desc=f'Creating {self.type}_DataSet'):
