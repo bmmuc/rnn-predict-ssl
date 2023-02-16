@@ -4,8 +4,8 @@ import numpy as np
 import sys
 import random
 import tqdm
-from src.aux_idx import Aux
-# import ipdb
+# from src.aux_idx import Aux
+import ipdb
 # from create_window import create_window
 def create_window(data, window_size, horizon = 1):
         out = []
@@ -42,15 +42,15 @@ class ConcatDataSetAutoencoder(Dataset):
         self.window = window
         self.is_pos = is_pos
         self.indexes_pos = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
-        aux_index = Aux.is_vel
+        # aux_index = Aux.is_vel
         self.bool_indexes = []
 
-        for value in aux_index:
-            self.bool_indexes.append(not value)
+        # for value in aux_index:
+        #     self.bool_indexes.append(not value)
 
-        self.actions_indexes = []
-        for i in aux_index:
-            self.actions_indexes.append(i)
+        # self.actions_indexes = []
+        # for i in aux_index:
+        #     self.actions_indexes.append(i)
 
         self.should_test_overffit = should_test_overffit
         self.horizons = horizon
@@ -99,33 +99,38 @@ class ConcatDataSetAutoencoder(Dataset):
             print(f'Loading the {self.type} data set...')
 
             self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
-
+            # ipdb.set_trace()
             print(f'Loaded the {self.type} data set')
 
     def __getitem__(self, idx):
         # ipdb.set_trace()
         if(self.is_pos):
-            X = self.data_windows[idx, :, self.bool_indexes]
-            X = X.reshape(-1, X.shape[0]).astype(np.float32)
+            # X = self.data_windows[idx, :, self.bool_indexes]
+            # X = X.reshape(-1, X.shape[0]).astype(np.float32)
 
-            y = self.data_windows[idx, :, self.bool_indexes]
-            y = y.reshape(-1, y.shape[0]).astype(np.float32)
+            # y = self.data_windows[idx, :, self.bool_indexes]
+            # y = y.reshape(-1, y.shape[0]).astype(np.float32)
+            X = self.data_windows[idx, :, :]
+            # X = X.reshape(-1, 38).astype(np.float32)
+
+            # y = self.data_windows[idx, :, :]
+            # y = y.reshape(-1, y.shape[0]).astype(np.float32)
         else:
             # ipdb.set_trace()
             X = self.data_windows[idx, :, self.actions_indexes]
-            X = X.reshape(-1, X.shape[0]).astype(np.float32)
+            # X = X.reshape(-1, X.shape[0]).astype(np.float32)
 
-            y = self.data_windows[idx, :, self.actions_indexes]
-            y = y.reshape(-1, y.shape[0]).astype(np.float32)
+            # y = self.data_windows[idx, :, self.actions_indexes]
+            # y = y.reshape(-1, y.shape[0]).astype(np.float32)
 
         # X = self.data_windows[idx]
         # y = self.data_windows[idx]
         # return 0
         # print(X.shape, y.shape)
-        return [np.array(X), np.array(y)]    
+        return [X, X]    
 
     def __len__(self):
-        return self.num_of_data_sets
+        return len(self.data_windows)
 
 
 if __name__ == '__main__':

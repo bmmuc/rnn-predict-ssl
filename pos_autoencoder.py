@@ -252,9 +252,9 @@ class PositionAutoEncoder(nn.Module):
         super().__init__()
         self.batch_size = batch_size
 
-        self.encoder = AttnEncoder(input_size, hidden_size, window, True)
+        self.encoder = AttnEncoder(input_size, hidden_size, window, False)
         self.decoder = AttnDecoder(
-            hidden_size, hidden_size, window, output_size, True)
+            hidden_size, hidden_size, window, output_size, False)
 
         self.data_root = data_root
         self.should_test_the_new_data_set = should_test_the_new_data_set
@@ -268,7 +268,7 @@ class PositionAutoEncoder(nn.Module):
         self.automatic_optimization = False
 
         self.opt = self.configure_optimizers(lr)
-        self.indexes = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
+        # self.indexes = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
 
     def forward(self, x):
         # ipdb.set_trace()
@@ -307,9 +307,25 @@ class PositionAutoEncoder(nn.Module):
 
         self.opt.zero_grad()
         general_loss.backward()
+
+        # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.000175)
+
         self.opt.step()
-        
-        return general_loss
+        ave_grads = []
+        norm_grad = []
+        total_norm = 0
+        # layers = []
+        for p in self.parameters():
+            if(p.requires_grad):
+                # layers.append(n)
+                ave_grads.append(torch.max(torch.abs(p.grad)).item())
+                param_norm = p.grad.data.norm(2)
+                norm_grad.append(param_norm.item())
+                total_norm += param_norm.item() ** 2
+                norm_grad.append(torch.norm(p.grad).item())
+        total_norm = total_norm ** (1. / 2)
+
+        return general_loss, max(ave_grads), max(norm_grad), total_norm
 
     def validation_step(self, X, y):
         self.eval()

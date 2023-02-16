@@ -5,12 +5,13 @@ from torch.utils.data import DataLoader
 import torch
 import wandb
 import ipdb
+from tqdm import tqdm
 
-BATCH_SIZE = 64
-HIDDEN_SIZE = 256
-WINDOW_SIZE = 50
+BATCH_SIZE = 8
+HIDDEN_SIZE = 1024
+WINDOW_SIZE = 10
 INPUT_SIZE = 38
-EPOCHS = 2
+EPOCHS = 100
 
 wandb.init(project="ssl_env", entity="breno-cavalcanti", name="pos_autoencoder_v2")
 
@@ -59,19 +60,44 @@ model = PositionAutoEncoder(
     lr=1e-3,
 )
 
-
+wandb.watch(model)
 
 step = 0
 val_step = 0
 
 for epoch in range(EPOCHS):
-    model.train()
+    # model.train()
     general_loss = 0
     total = 0
     total_val = 0 
     general_val_loss = 0
+    # ipdb.set_trace()
 
-    for i, (x, y) in enumerate(val_loader):
+    for x, y in tqdm(train_loader):
+        x = x.to(model.device)
+        y = y.to(model.device)
+        loss, ave_grads, norm_grad, total_norm = model.training_step(x, y)
+
+        loss_dict = {
+            'loss_pos_train/step': loss.item(),
+            # 'grads/ave_grads': float(ave_grads),
+            # 'grads/norm_grad': float(norm_grad),
+            'grads/total_norm': total_norm,
+        }
+
+        wandb.log(loss_dict)
+        step += 1
+        general_loss += loss.item()
+        total += 1
+
+    loss_dict = {
+        'loss_pos_train/epoch': general_loss / len(train_loader),
+    }
+
+    wandb.log(loss_dict)
+
+    # print(f'Epoch: {epoch}, loss: {general_loss / total}')
+    for x, y in tqdm(val_loader):
         x = x.to(model.device)
         y = y.to(model.device)
         loss = model.validation_step(x, y)
@@ -81,37 +107,18 @@ for epoch in range(EPOCHS):
         wandb.log(loss_dict)
         val_step += 1
         total_val += 1
-        general_val_loss += loss
+        general_val_loss += loss.item()
 
     loss_dict = {
-        'loss_pos_val/epoch': general_val_loss / total_val,
+        'loss_pos_val/epoch': general_val_loss / len(val_loader),
     }
 
     wandb.log(loss_dict)
-
-    for i, (x, y) in enumerate(train_loader):
-        x = x.to(model.device)
-        y = y.to(model.device)
-        loss = model.training_step(x, y)
-        loss_dict = {
-            'loss_pos_train/step': loss,
-        }
-        wandb.log(loss_dict)
-        step += 1
-        general_loss += loss
-        total += 1
-    loss_dict = {
-        'loss_pos_train/epoch': general_loss / total,
-    }
-    wandb.log(loss_dict)
-
-    print(f'Epoch: {epoch}, loss: {general_loss / total}')
-
+    # ipdb.set_trace()
 
     # writer.add_scalars('loss_pos_train_vs_val', {'val': general_val_loss / total_val,
     #                                         'train': general_loss / total})
 
-
-    print(f'Epoch: {epoch}, loss_pos_val: {general_val_loss / total_val}')
+    # print(f'Epoch: {epoch}, loss_pos_val: {general_val_loss / total_val}')
 
 torch.save(model.state_dict(), './model_pos.pth')

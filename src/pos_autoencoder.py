@@ -312,7 +312,7 @@ class PositionAutoEncoder(pl.LightningModule):
     def forward(self, x):
         # ipdb.set_trace()
         x_copy = x.clone()
-        x_copy = x_copy[:, :, self.indexes]
+        # x_copy = x_copy[:, :, self.indexes]
 
         att, encoded = self.encoder(x_copy)
 
