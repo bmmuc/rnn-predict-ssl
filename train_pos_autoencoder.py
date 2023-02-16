@@ -90,9 +90,9 @@ for epoch in range(EPOCHS):
         general_loss += loss.item()
         total += 1
 
-    loss_dict = {
-        'loss_pos_train/epoch': general_loss / len(train_loader),
-    }
+    # loss_dict = {
+    #     'loss_pos_train/epoch': general_loss / len(train_loader),
+    # }
 
     wandb.log(loss_dict)
 
@@ -109,9 +109,9 @@ for epoch in range(EPOCHS):
         total_val += 1
         general_val_loss += loss.item()
 
-    loss_dict = {
-        'loss_pos_val/epoch': general_val_loss / len(val_loader),
-    }
+    # loss_dict = {
+    #     'loss_pos_val/epoch': general_val_loss / len(val_loader),
+    # }
 
     wandb.log(loss_dict)
     # ipdb.set_trace()
