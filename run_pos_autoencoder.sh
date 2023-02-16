@@ -5,4 +5,4 @@
 #SBATCH --error=job_error.txt
 conda activate bmmuc
 git pull
-python train_pos_autoencoder
+python train_pos_autoencoder.py
