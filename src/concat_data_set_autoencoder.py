@@ -4,7 +4,8 @@ import numpy as np
 import sys
 import random
 import tqdm
-
+from src.aux_idx import Aux
+# import ipdb
 # from create_window import create_window
 def create_window(data, window_size, horizon = 1):
         out = []
@@ -15,7 +16,6 @@ def create_window(data, window_size, horizon = 1):
             label = data[i+window_size : i+window_size+horizon, :]
             out.append((window,label))
         return out
-import ipdb
 
 class ConcatDataSetAutoencoder(Dataset):
     """Multi-variate Time-Series ConcatDataset for *.txt file
@@ -42,7 +42,16 @@ class ConcatDataSetAutoencoder(Dataset):
         self.window = window
         self.is_pos = is_pos
         self.indexes_pos = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
-        self.bool_indexes = [i in self.indexes_pos for i in range(42)]
+        aux_index = Aux.is_vel
+        self.bool_indexes = []
+
+        for value in aux_index:
+            self.bool_indexes.append(not value)
+
+        self.actions_indexes = []
+        for i in aux_index:
+            self.actions_indexes.append(i)
+
         self.should_test_overffit = should_test_overffit
         self.horizons = horizon
         self.should_test_the_new_data_set = should_test_the_new_data_set
@@ -89,27 +98,31 @@ class ConcatDataSetAutoencoder(Dataset):
         else:
             print(f'Loading the {self.type} data set...')
 
-            self.data_windows = np.load(f'./{self.type}_data_windows.npy')
+            self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
 
             print(f'Loaded the {self.type} data set')
 
     def __getitem__(self, idx):
+        # ipdb.set_trace()
         if(self.is_pos):
             X = self.data_windows[idx, :, self.bool_indexes]
-            X = X.reshape(-1, 22)
+            X = X.reshape(-1, X.shape[0]).astype(np.float32)
 
             y = self.data_windows[idx, :, self.bool_indexes]
-            y = y.reshape(-1, 22)
+            y = y.reshape(-1, y.shape[0]).astype(np.float32)
         else:
             # ipdb.set_trace()
-            X = self.data_windows[idx, :, 40:42]
-            y = self.data_windows[idx, :, 40:42]
+            X = self.data_windows[idx, :, self.actions_indexes]
+            X = X.reshape(-1, X.shape[0]).astype(np.float32)
 
+            y = self.data_windows[idx, :, self.actions_indexes]
+            y = y.reshape(-1, y.shape[0]).astype(np.float32)
 
         # X = self.data_windows[idx]
         # y = self.data_windows[idx]
         # return 0
-        return [X, y]    
+        # print(X.shape, y.shape)
+        return [np.array(X), np.array(y)]    
 
     def __len__(self):
         return self.num_of_data_sets
@@ -119,5 +132,7 @@ if __name__ == '__main__':
 
     test = ConcatDataSetAutoencoder(root_dir= '/home/bmmuc/Documents/robocin/rnn/all_data/data-v4', num_of_data_sets= 100, horizon=1, is_to_debug=True,
         is_pos=False)
+    test = ConcatDataSetAutoencoder(root_dir= '/home/bmmuc/Documents/robocin/rnn/all_data/data-v4', num_of_data_sets= 100, horizon=1, is_to_debug=True,
+        is_pos=True)
     test.__getitem__(0)
     # test.__getitem__(40602)lf.root_dir + f'/positions-{i}.txt'), dtype=np.float32)

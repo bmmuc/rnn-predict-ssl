@@ -1,2 +1,7 @@
 /log_raw
 ./runs
+*.npy
+/wandb
+*run*
+*.pth
+*pyc

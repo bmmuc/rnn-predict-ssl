@@ -81,6 +81,6 @@ class CreateDataSetFile():
         return X, y
 
 if __name__ == '__main__':
-    root_dir = '/home/bmmuc/Documents/robocin/rnn/rnn-predict-ssl/log_raw'
+    root_dir = '/home/bmmuc/Documents/robocin/new_logs'
     CreateDataSetFile(root_dir, window=50, type_of_data='train', horizon=1)
     CreateDataSetFile(root_dir, window=50, type_of_data='val', horizon=1)
