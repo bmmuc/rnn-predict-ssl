@@ -7,8 +7,8 @@ import wandb
 import ipdb
 from tqdm import tqdm
 
-BATCH_SIZE = 8
-HIDDEN_SIZE = 1024
+BATCH_SIZE = 128
+HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 38
 EPOCHS = 100
@@ -90,10 +90,6 @@ for epoch in range(EPOCHS):
         general_loss += loss.item()
         total += 1
 
-    # loss_dict = {
-    #     'loss_pos_train/epoch': general_loss / len(train_loader),
-    # }
-
     wandb.log(loss_dict)
 
     # print(f'Epoch: {epoch}, loss: {general_loss / total}')
@@ -101,19 +97,22 @@ for epoch in range(EPOCHS):
         x = x.to(model.device)
         y = y.to(model.device)
         loss = model.validation_step(x, y)
-        loss_dict = {
-            'loss_pos_val/step': loss,
-        }
-        wandb.log(loss_dict)
+        # loss_dict = {
+        #     'loss_pos_val/step': loss,
+        # }
+        # wandb.log(loss_dict)
         val_step += 1
         total_val += 1
         general_val_loss += loss.item()
 
-    # loss_dict = {
-    #     'loss_pos_val/epoch': general_val_loss / len(val_loader),
-    # }
+    loss_dict = {
+        'loss_pos_train/epoch': general_loss / len(train_loader),
+        'loss_pos_val/epoch': general_val_loss / len(val_loader),
+    }
 
     wandb.log(loss_dict)
+
+    # wandb.log(loss_dict)
     # ipdb.set_trace()
 
     # writer.add_scalars('loss_pos_train_vs_val', {'val': general_val_loss / total_val,
