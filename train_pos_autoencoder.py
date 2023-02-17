@@ -30,7 +30,7 @@ train_loader = DataLoader(
             dataset,
             shuffle= True,
             batch_size=BATCH_SIZE,
-            num_workers=6,
+            num_workers=10,
             pin_memory=True
 )
 
@@ -48,7 +48,7 @@ dataset = ConcatDataSetAutoencoder(
 val_loader = DataLoader(
             dataset,
             batch_size=BATCH_SIZE,
-            num_workers=1,
+            num_workers=10,
             pin_memory=True
 )
 
