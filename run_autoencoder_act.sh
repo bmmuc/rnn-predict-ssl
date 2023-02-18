@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --job-name=rl-isaac-training
+#SBATCH --job-name=act_encoder
 #SBATCH --ntasks=1
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=32
