@@ -300,9 +300,25 @@ class ActAutoEncoder(nn.Module):
 
         self.opt.zero_grad()
         general_loss.backward()
+
+        # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.000175)
+
         self.opt.step()
-        
-        return general_loss
+        ave_grads = []
+        norm_grad = []
+        total_norm = 0
+        # layers = []
+        for p in self.parameters():
+            if(p.requires_grad):
+                # layers.append(n)
+                ave_grads.append(torch.max(torch.abs(p.grad)).item())
+                param_norm = p.grad.data.norm(2)
+                norm_grad.append(param_norm.item())
+                total_norm += param_norm.item() ** 2
+                norm_grad.append(torch.norm(p.grad).item())
+        total_norm = total_norm ** (1. / 2)
+
+        return general_loss, max(ave_grads), max(norm_grad), total_norm
 
     def validation_step(self, X, y):
         self.eval()

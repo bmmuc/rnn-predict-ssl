@@ -66,8 +66,8 @@ class CreateDataSetFile():
         self.data_labels = np.array(self.data_labels)
         # ipdb.set_trace()
         print(f'Creating {self.type}_DataSet: {self.data_windows.shape}, {self.data_labels.shape}')
-        np.save(f'{self.type}_data_windows.npy', self.data_windows, allow_pickle=True)
-        np.save(f'{self.type}_data_labels.npy', self.data_labels, allow_pickle=True)
+        np.save(f'{self.type}_data_windows_full.npy', self.data_windows, allow_pickle=True)
+        np.save(f'{self.type}_data_labels_full.npy', self.data_labels, allow_pickle=True)
 
         del data
 
@@ -80,6 +80,6 @@ class CreateDataSetFile():
         return X, y
 
 if __name__ == '__main__':
-    root_dir = '/home/bmmuc/Documents/robocin/new_logs'
+    root_dir = '/home/bmmuc/Documents/robocin/new_logs_full'
     CreateDataSetFile(root_dir, window=10, type_of_data='train', horizon=1)
     CreateDataSetFile(root_dir, window=10, type_of_data='val', horizon=1)

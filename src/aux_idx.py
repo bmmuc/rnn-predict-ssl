@@ -1,8 +1,6 @@
 class Aux:
     is_vel =[False,
  False,
- True,
- True,
  False,
  False,
  False,

@@ -4,3 +4,5 @@
 /wandb
 *.pth
 *pyc
+/runs
+/runs_to_show

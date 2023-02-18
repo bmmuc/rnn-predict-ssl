@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import random
 import tqdm
-# from src.aux_idx import Aux
+from src.aux_idx import Aux
 import ipdb
 # from create_window import create_window
 def create_window(data, window_size, horizon = 1):
@@ -42,15 +42,15 @@ class ConcatDataSetAutoencoder(Dataset):
         self.window = window
         self.is_pos = is_pos
         self.indexes_pos = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
-        # aux_index = Aux.is_vel
+        aux_index = Aux.is_vel
         self.bool_indexes = []
 
-        # for value in aux_index:
-        #     self.bool_indexes.append(not value)
+        for value in aux_index:
+            self.bool_indexes.append(not value)
 
-        # self.actions_indexes = []
-        # for i in aux_index:
-        #     self.actions_indexes.append(i)
+        self.actions_indexes = []
+        for i in aux_index:
+            self.actions_indexes.append(i)
 
         self.should_test_overffit = should_test_overffit
         self.horizons = horizon
@@ -73,36 +73,16 @@ class ConcatDataSetAutoencoder(Dataset):
         return X, y
 
     def init_dataset(self):
-        if not self.should_test_the_new_data_set:
-            for i in tqdm.tqdm(range(self.num_of_data_sets), desc=f'Creating {self.type}_DataSet'):
-                data = np.loadtxt(open(self.root_dir + f'/positions-{i}.txt'), dtype=np.float32)
-                data = create_window(data, self.window, 1)
-                for window, _ in data:
-                    if(len(window[0]) == 41):
-                        # ipdb.set_trace()
-                        self.data_windows.append(window[:, :-1])
-                        self.data_labels.append(window[:, :-1])
-                        # assert False, f'error no tamanho, {len(window[0])}, no data_set: de id {i}'
-                    else:
-                        self.data_windows.append(window)
-                        self.data_labels.append(window)
-
-
-            _data_windows, self.data_labels = self._shuffle(self.data_windows, self.data_labels)
-
-            self.data_windows = np.array(_data_windows)
-            self.data_labels = np.array(self.data_labels)
-
-            del data
-
-        else:
-            print(f'Loading the {self.type} data set...')
-
+        print(f'Loading the {self.type} data set...')
+        if self.is_pos:
             self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
-            # ipdb.set_trace()
-            print(f'Loaded the {self.type} data set')
+        else:
+            self.data_windows = np.load(f'./datasets_full/{self.type}_data_windows_full.npy', allow_pickle=True)
+        # ipdb.set_trace()
+        print(f'Loaded the {self.type} data set')
 
     def __getitem__(self, idx):
+        # ipdb.set_trace()
         # ipdb.set_trace()
         if(self.is_pos):
             # X = self.data_windows[idx, :, self.bool_indexes]
@@ -110,7 +90,7 @@ class ConcatDataSetAutoencoder(Dataset):
 
             # y = self.data_windows[idx, :, self.bool_indexes]
             # y = y.reshape(-1, y.shape[0]).astype(np.float32)
-            X = self.data_windows[idx, :, :]
+            X = self.data_windows[idx, :, self.bool_indexes]
             # X = X.reshape(-1, 38).astype(np.float32)
 
             # y = self.data_windows[idx, :, :]
@@ -127,6 +107,7 @@ class ConcatDataSetAutoencoder(Dataset):
         # y = self.data_windows[idx]
         # return 0
         # print(X.shape, y.shape)
+        X = X.reshape(-1, X.shape[0]).astype(np.float32)
         return [X, X]    
 
     def __len__(self):
