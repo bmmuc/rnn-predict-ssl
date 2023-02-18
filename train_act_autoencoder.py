@@ -12,7 +12,7 @@ HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 36
 EPOCHS = 100
-NUM_WORKERS = 3
+NUM_WORKERS = 10
 wandb.init(project="ssl_env_acts", entity="breno-cavalcanti", name="act_autoencoder_v0")
 
 dataset = ConcatDataSetAutoencoder(
