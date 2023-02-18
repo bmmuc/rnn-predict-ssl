@@ -6,4 +6,4 @@
 . "/usr/local/anaconda3/etc/profile.d/conda.sh"
 conda activate bmmuc
 git pull
-python train_pos_autoencoder.py
+python train_act_autoencoder.py
