@@ -74,10 +74,10 @@ class ConcatDataSetAutoencoder(Dataset):
 
     def init_dataset(self):
         print(f'Loading the {self.type} data set...')
-        if self.is_pos:
-            self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
-        else:
-            self.data_windows = np.load(f'./datasets_full/{self.type}_data_windows_full.npy', allow_pickle=True)
+        # if self.is_pos:
+        #     self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
+        # else:
+        self.data_windows = np.load(f'./datasets_full/{self.type}_data_windows_full.npy', allow_pickle=True)
         # ipdb.set_trace()
         print(f'Loaded the {self.type} data set')
 
