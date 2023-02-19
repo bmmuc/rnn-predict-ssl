@@ -6,7 +6,7 @@ from torch.nn import functional as tf
 from torch.optim import Adam
 from torch.nn import functional as F
 import ipdb
-
+from src.aux_idx import Aux
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -266,7 +266,12 @@ class PositionAutoEncoder(nn.Module):
         self.num_of_data_to_train = num_of_data_to_train
         self.num_of_data_to_val = num_of_data_to_val
         self.automatic_optimization = False
+        indexes_act = Aux.is_vel
+        #self.indexes will be not self.indexes_act
+        self.indexes = []
 
+        for value in indexes_act:
+            self.indexes.append(not value)
         self.opt = self.configure_optimizers(lr)
         # self.indexes = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
 

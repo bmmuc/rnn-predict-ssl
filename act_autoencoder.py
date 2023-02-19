@@ -6,7 +6,7 @@ from torch.nn import functional as tf
 from torch.optim import Adam
 from torch.nn import functional as F
 import ipdb
-
+from src.aux_idx import Aux
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -259,7 +259,7 @@ class ActAutoEncoder(nn.Module):
         self.device = torch.device('cuda')
         self.lr = lr
         self.opt = self.configure_optimizers(self.lr)
-
+        self.indexes = Aux.is_vel
         self.should_test_overffit = False
 
     def forward(self, x):
