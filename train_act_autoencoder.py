@@ -110,4 +110,4 @@ for epoch in range(EPOCHS):
 
     # print(f'Epoch: {epoch}, loss_pos_val: {general_val_loss / total_val}')
 
-torch.save(model.state_dict(), './model_pos.pth')
+torch.save(model.state_dict(), './model_act.pth')
