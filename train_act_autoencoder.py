@@ -6,15 +6,17 @@ import torch
 import wandb
 import ipdb
 from tqdm import tqdm
+from datetime import datetime
+import pytz
 
 BATCH_SIZE = 32
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 36
-EPOCHS = 100
+EPOCHS = 3
 NUM_WORKERS = 10
-wandb.init(project="ssl_env_acts", entity="breno-cavalcanti", name="act_autoencoder_v0")
-
+LR = 1e-3
+HORIZON_SIZE = 1
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
     num_of_data_sets=100,
@@ -22,7 +24,7 @@ dataset = ConcatDataSetAutoencoder(
     is_pos=False,
     should_test_the_new_data_set=True,
     type_of_data='train',
-    horizon=1
+    horizon=HORIZON_SIZE
 )
 
 
@@ -42,7 +44,7 @@ dataset = ConcatDataSetAutoencoder(
     is_pos=False,
     should_test_the_new_data_set=True,
     type_of_data='val',
-    horizon=1
+    horizon=HORIZON_SIZE
 )
 
 val_loader = DataLoader(
@@ -57,57 +59,62 @@ model = ActAutoEncoder(
     input_size=INPUT_SIZE,
     hidden_size= HIDDEN_SIZE,
     output_size=INPUT_SIZE,
-    lr=1e-3,
+    lr=LR,
 )
+today = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%Y-%m-%d_%H:%M:%S")
+
+wandb.init(project="ssl_env_acts", entity="breno-cavalcanti", name=f"act_autoencoder_{today}",
+           config={
+        "batch_size": BATCH_SIZE,
+        "hidden_size": HIDDEN_SIZE,
+        "window_size": WINDOW_SIZE,
+        "input_size": INPUT_SIZE,
+        "epochs": EPOCHS,
+        "lr": LR,
+        "horizon": HORIZON_SIZE
+        })
+
+wandb.define_metric("epoch")
+
 
 wandb.watch(model)
 
-step = 0
-val_step = 0
-
-for epoch in range(EPOCHS):
-    # model.train()
-    general_loss = 0
-    total = 0
-    total_val = 0 
+steps = 0
+epochs = 0
+for epoch in tqdm(range(EPOCHS)):
+    wandb.log({'epoch': epochs})
     general_val_loss = 0
-    # ipdb.set_trace()
 
-    for x, y in tqdm(train_loader):
-        x = x.to(model.device)
-        y = y.to(model.device)
-        loss, ave_grads, norm_grad, total_norm = model.training_step(x, y)
-
-        loss_dict = {
-            'loss_pos_train/step': loss.item(),
-            # 'grads/ave_grads': float(ave_grads),
-            # 'grads/norm_grad': float(norm_grad),
-            'grads/total_norm': total_norm,
-        }
-
-        wandb.log(loss_dict)
-        step += 1
-        general_loss += loss.item()
-        total += 1
-
-
-    # print(f'Epoch: {epoch}, loss: {general_loss / total}')
     for x, y in tqdm(val_loader):
         x = x.to(model.device)
         y = y.to(model.device)
         loss = model.validation_step(x, y)
 
-        val_step += 1
-        total_val += 1
         general_val_loss += loss.item()
 
-    loss_dict = {
-        'loss_pos_train/epoch': general_loss / len(train_loader),
-        'loss_pos_val/epoch': general_val_loss / len(val_loader),
+    general_loss = 0
+    for x, y in tqdm(train_loader):
+        x = x.to(model.device)
+        y = y.to(model.device)
+        loss, ave_grads, norm_grad, total_norm = model.training_step(x, y)
+        steps += 1
+        loss_dict = {
+            'global_step': steps,
+            'loss_act_train/step': loss.item(),
+        }
+
+        wandb.log(loss_dict)
+
+        general_loss += loss.item()
+
+        
+    log_dict = {
+        'loss_act_train/epoch': general_loss / len(train_loader),
+        'loss_act_val/epoch': general_val_loss / len(val_loader),
     }
 
-    wandb.log(loss_dict)
+    wandb.log(log_dict)
+    epochs += 1
 
-    # print(f'Epoch: {epoch}, loss_pos_val: {general_val_loss / total_val}')
 
 torch.save(model.state_dict(), './model_act.pth')
