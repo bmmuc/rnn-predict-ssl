@@ -9,12 +9,12 @@ from tqdm import tqdm
 import pytz
 from datetime import datetime, timezone
 
-BATCH_SIZE = 64
-HIDDEN_SIZE = 64
+BATCH_SIZE = 32
+HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
-EPOCHS = 3
+EPOCHS = 100
 LR = 1e-3
 
 
