@@ -8,7 +8,7 @@ import ipdb
 from tqdm import tqdm
 
 BATCH_SIZE = 128
-HIDDEN_SIZE = 256
+HIDDEN_SIZE = 128
 WINDOW_SIZE = 10
 INPUT_SIZE = 38
 EPOCHS = 100
