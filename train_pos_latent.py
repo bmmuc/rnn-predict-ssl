@@ -15,7 +15,7 @@ WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
 LR=1e-3
-WEIGHTS = [0.95, 0.05]
+WEIGHTS = [1, 0]
 
 ACT_PATH = './model_act.pth'
 POS_PATH = './model_pos.pth'
