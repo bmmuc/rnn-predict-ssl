@@ -287,7 +287,9 @@ class PosLatent(nn.Module):
         general_loss = self.weitght_pos * loss_pos +  self.weitght_acts * loss_act
 
         self.opt.zero_grad()
+
         general_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.parameters(), 0.0175)
 
         self.opt.step()
 
