@@ -10,7 +10,7 @@ import pytz
 from datetime import datetime, timezone
 
 BATCH_SIZE = 32
-HIDDEN_SIZE = 256
+HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
@@ -30,11 +30,11 @@ dataset = ConcatDataSetAutoencoder(
 
 
 train_loader = DataLoader(
-            dataset,
-            shuffle= True,
-            batch_size=BATCH_SIZE,
-            num_workers=10,
-            pin_memory=True
+    dataset,
+    shuffle=True,
+    batch_size=BATCH_SIZE,
+    num_workers=10,
+    pin_memory=True
 )
 
 
@@ -49,31 +49,32 @@ dataset = ConcatDataSetAutoencoder(
 )
 
 val_loader = DataLoader(
-            dataset,
-            batch_size=BATCH_SIZE,
-            num_workers=10,
-            pin_memory=True
+    dataset,
+    batch_size=BATCH_SIZE,
+    num_workers=10,
+    pin_memory=True
 )
 
 model = PositionAutoEncoder(
-    window= WINDOW_SIZE,
+    window=WINDOW_SIZE,
     input_size=INPUT_SIZE,
-    hidden_size= HIDDEN_SIZE,
+    hidden_size=HIDDEN_SIZE,
     output_size=INPUT_SIZE,
     lr=LR,
 )
-today = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%Y-%m-%d_%H:%M:%S")
+today = datetime.now(pytz.timezone('America/Sao_Paulo')
+                     ).strftime("%Y-%m-%d_%H:%M:%S")
 
 wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_{today}",
            config={
-        "batch_size": BATCH_SIZE,
-        "hidden_size": HIDDEN_SIZE,
-        "window_size": WINDOW_SIZE,
-        "input_size": INPUT_SIZE,
-        "epochs": EPOCHS,
-        "lr": LR,
-        "horizon": HORIZON_SIZE
-        })
+               "batch_size": BATCH_SIZE,
+               "hidden_size": HIDDEN_SIZE,
+               "window_size": WINDOW_SIZE,
+               "input_size": INPUT_SIZE,
+               "epochs": EPOCHS,
+               "lr": LR,
+               "horizon": HORIZON_SIZE
+           })
 
 wandb.define_metric("epoch")
 
@@ -108,7 +109,6 @@ for epoch in tqdm(range(EPOCHS)):
 
         general_loss += loss.item()
 
-        
     log_dict = {
         # 'epoch': epochs,
         'loss_pos_train/epoch': general_loss / len(train_loader),
