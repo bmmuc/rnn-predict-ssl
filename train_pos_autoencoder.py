@@ -73,6 +73,7 @@ wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_
                "input_size": INPUT_SIZE,
                "epochs": EPOCHS,
                "lr": LR,
+               "noise": True,
                "horizon": HORIZON_SIZE
            })
 
