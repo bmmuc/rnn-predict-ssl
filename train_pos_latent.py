@@ -17,7 +17,7 @@ INPUT_SIZE = 74
 EPOCHS = 100
 LR = 1e-5
 NUM_WORKERS = 15
-WEIGHTS = [0.9, 0.1]
+WEIGHTS = [0.5, 0.5]
 
 ACT_PATH = './model_act.pth'
 POS_PATH = './model_pos.pth'
