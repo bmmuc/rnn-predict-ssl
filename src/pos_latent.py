@@ -256,16 +256,15 @@ class PosLatent(pl.LightningModule):
                  data_root='',
                  num_of_data_to_train=0, num_of_data_to_val=0,
                  output_size=20,
-                 weights = (0.5, 0.5),
+                 weights=(0.5, 0.5),
                  should_test_the_new_data_set=False,
-                 act_path = '',
-                 pos_path = '',
+                 act_path='',
+                 pos_path='',
                  act_path_autoencoder='',
-                 lr= 1e-3,
+                 lr=1e-3,
                  ):
         super().__init__()
         self.batch_size = batch_size
-
 
         self.data_root = data_root
         self.should_test_the_new_data_set = should_test_the_new_data_set
@@ -277,18 +276,22 @@ class PosLatent(pl.LightningModule):
         self.automatic_optimization = False
 
         # self.encoder = ConcatAutoEncoder(window=window, input_size=input_size, hidden_size=hidden_size, output_size=output_size,
-                # pos_path = './autoencoder/rnn-autoencoder-v3/2maykc2c/checkpoints/epoch=255-step=60927.ckpt',
-                # act_path_autoencoder='./next_positions/rnn-predict-next-positions-with-v3/2a5vkx8o/checkpoints/epoch=255-step=60927.ckpt',)
+        # pos_path = './autoencoder/rnn-autoencoder-v3/2maykc2c/checkpoints/epoch=255-step=60927.ckpt',
+        # act_path_autoencoder='./next_positions/rnn-predict-next-positions-with-v3/2a5vkx8o/checkpoints/epoch=255-step=60927.ckpt',)
         # self.encoder = self.encoder.load_from_checkpoint(act_path_autoencoder)
 
-        self.pos_autoencoder = PositionAutoEncoder(window=window, input_size=input_size, hidden_size=hidden_size, output_size=22)
-        self.pos_autoencoder = self.pos_autoencoder.load_from_checkpoint(pos_path)
+        self.pos_autoencoder = PositionAutoEncoder(
+            window=window, input_size=input_size, hidden_size=hidden_size, output_size=22)
+        self.pos_autoencoder = self.pos_autoencoder.load_from_checkpoint(
+            pos_path)
 
         # self.act_forecast = ActAutoEncoder(window=self.window, input_size=input_size, hidden_size=hidden_size, output_size=18)
         # self.act_forecast = self.act_forecast.load_from_checkpoint(act_path)
 
-        self.act_autoencoder = ActAutoEncoder(window=self.window, input_size=input_size, hidden_size=hidden_size, output_size=18)
-        self.act_autoencoder = self.act_autoencoder.load_from_checkpoint(act_path)
+        self.act_autoencoder = ActAutoEncoder(
+            window=self.window, input_size=input_size, hidden_size=hidden_size, output_size=18)
+        self.act_autoencoder = self.act_autoencoder.load_from_checkpoint(
+            act_path)
 
         self.pos_autoencoder = self.pos_autoencoder.eval()
         self.act_autoencoder = self.act_autoencoder.eval()
@@ -298,21 +301,24 @@ class PosLatent(pl.LightningModule):
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
             'linear4': nn.Linear(512, 512),
+            'dropout1': nn.Dropout(0.25),
             'linear5': nn.Linear(512, 512),
             'linear8': nn.Linear(512, 256),
             'linear9': nn.Linear(256, 256),
             'linear10': nn.Linear(256, 256),
+            'dropout2': nn.Dropout(0.15),
             'linear11': nn.Linear(256, 256),
             'linear12': nn.Linear(256, 256),
             'linear13': nn.Linear(256, 256),
             'linear14': nn.Linear(256, 256),
             'linear15': nn.Linear(256, 256),
+            'dropout3': nn.Dropout(0.5),
             'linear16': nn.Linear(256, 256),
 
         })
 
         self.pred_act = nn.ModuleDict({
-            'linear1': nn.Linear(256, 1024), # estrutura pos => (512, 1024)
+            'linear1': nn.Linear(256, 1024),  # estrutura pos => (512, 1024)
             # 'linear1': nn.Linear(512, 1024), # estrutura pos + act => (512, 1024)
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
@@ -325,7 +331,7 @@ class PosLatent(pl.LightningModule):
             'linear10': nn.Linear(256, 256),
         })
 
-        self.opt = self.configure_optimizers() # testar 2 optimizers
+        self.opt = self.configure_optimizers()  # testar 2 optimizers
 
         self.weitght_pos = weights[0]
         self.weitght_acts = weights[1]
@@ -336,50 +342,52 @@ class PosLatent(pl.LightningModule):
         torch.autograd.set_detect_anomaly(True)
         self.render = True
 
-        self.indexes = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
-        self.indexes_act = [8, 9, 10, 15, 16, 17, 22, 23, 24, 27, 28, 29, 32,33, 34, 37, 38, 39]
+        self.indexes = [0, 1, 2, 3, 4, 5, 6, 7, 11, 12,
+                        13, 14, 18, 19, 20, 21, 25, 26, 30, 31, 35, 36]
+        self.indexes_act = [8, 9, 10, 15, 16, 17, 22,
+                            23, 24, 27, 28, 29, 32, 33, 34, 37, 38, 39]
 
         self.should_test_overffit = False
 
     def train_dataloader(self):
         dataset = ConcatDataSet(
-            root_dir = self.data_root,
-            num_of_data_sets= self.num_of_data_to_train,
-            window = self.window,
-            type_of_data= 'train',
-            should_test_the_new_data_set = self.should_test_the_new_data_set,
-            should_test_overffit = self.should_test_overffit,
-            horizon = 1
-            )
+            root_dir=self.data_root,
+            num_of_data_sets=self.num_of_data_to_train,
+            window=self.window,
+            type_of_data='train',
+            should_test_the_new_data_set=self.should_test_the_new_data_set,
+            should_test_overffit=self.should_test_overffit,
+            horizon=1
+        )
 
         # self.num_of_windows = dataset.num_of_windows
 
         loader = DataLoader(
-                    dataset,
-                    shuffle= True,
-                    batch_size=self.batch_size,
-                    num_workers=6,
-                    pin_memory=True
-                )
+            dataset,
+            shuffle=True,
+            batch_size=self.batch_size,
+            num_workers=6,
+            pin_memory=True
+        )
 
         return loader
 
     def test_dataloader(self):
         dataset = ConcatDataSet(
-                root_dir = self.data_root + '-val',
-                num_of_data_sets = self.num_of_data_to_val,
-                window = self.window,
-                type_of_data= 'val',
-                should_test_the_new_data_set = self.should_test_the_new_data_set,
-                horizon = 1
-            )
+            root_dir=self.data_root + '-val',
+            num_of_data_sets=self.num_of_data_to_val,
+            window=self.window,
+            type_of_data='val',
+            should_test_the_new_data_set=self.should_test_the_new_data_set,
+            horizon=1
+        )
 
         loader = DataLoader(
-                    dataset,
-                    batch_size=self.batch_size,
-                    num_workers=1,
-                    pin_memory=True
-                )
+            dataset,
+            batch_size=self.batch_size,
+            num_workers=1,
+            pin_memory=True
+        )
 
         return loader
 
@@ -390,15 +398,18 @@ class PosLatent(pl.LightningModule):
             out = self.pred_pos['linear2'](out)
             out = self.pred_pos['linear3'](out)
             out = self.pred_pos['linear4'](out)
+            out = self.pred_pos['dropout1'](out)
             out = self.pred_pos['linear5'](out)
             out = self.pred_pos['linear8'](out)
             out = self.pred_pos['linear9'](out)
             out = self.pred_pos['linear10'](out)
+            out = self.pred_pos['dropout2'](out)
             out = self.pred_pos['linear11'](out)
             out = self.pred_pos['linear12'](out)
             out = self.pred_pos['linear13'](out)
             out = self.pred_pos['linear14'](out)
             out = self.pred_pos['linear15'](out)
+
             out_pred_pos = self.pred_pos['linear16'](out)
 
         return out_pred_pos
@@ -429,14 +440,15 @@ class PosLatent(pl.LightningModule):
             y_hist_pos = y_hist[:, :, self.indexes]
             y_hist_act = y_hist[:, :, self.indexes_act]
 
-
             act_encoded = self.act_autoencoder.encoding(x_hist)
 
             pos_encoded = self.pos_autoencoder.encoding(x_hist)
 
-            act_pos_hidden_concat = torch.cat((act_encoded, pos_encoded), dim=2)
+            act_pos_hidden_concat = torch.cat(
+                (act_encoded, pos_encoded), dim=2)
 
-            act_pos_hidden_concat = act_pos_hidden_concat.to(torch.device('cuda'))
+            act_pos_hidden_concat = act_pos_hidden_concat.to(
+                torch.device('cuda'))
             act_encoded = act_encoded.to(torch.device('cuda'))
 
             # next_act_hidden = act_encoded.clone()
@@ -461,40 +473,42 @@ class PosLatent(pl.LightningModule):
             #         # act_encoded = next_act_hidden
             #         # ate aq
 
-
             for i in range(n_steps):
-                    next_pos_hidden = self.run_pos(act_pos_hidden_concat)
-                    next_act_hidden = self.run_act(act_pos_hidden_concat) # -> usar quando for a estrutura pos + act
-                    # next_act_hidden = self.run_act(act_encoded)
+                next_pos_hidden = self.run_pos(act_pos_hidden_concat)
+                # -> usar quando for a estrutura pos + act
+                next_act_hidden = self.run_act(act_pos_hidden_concat)
+                # next_act_hidden = self.run_act(act_encoded)
 
-
-                    act_pos_hidden_concat = torch.cat((next_act_hidden, next_pos_hidden), dim=2)
-                    act_encoded = next_act_hidden
+                act_pos_hidden_concat = torch.cat(
+                    (next_act_hidden, next_pos_hidden), dim=2)
+                act_encoded = next_act_hidden
 
                 # y_hist_pos = self.pos_autoencoder.decoding(next_pos_hidden, y_hist_pos)
                 # y_hist_act = self.act_autoencoder.decoding(act_encoded, y_hist_act)
 
-            pos_decoded = self.pos_autoencoder.decoding(next_pos_hidden, y_hist_pos)
-            act_decoded = self.act_autoencoder.decoding(next_act_hidden, y_hist_act)
+            pos_decoded = self.pos_autoencoder.decoding(
+                next_pos_hidden, y_hist_pos)
+            act_decoded = self.act_autoencoder.decoding(
+                next_act_hidden, y_hist_act)
 
-        return pos_decoded, act_decoded    
+        return pos_decoded, act_decoded
 
     def val_dataloader(self):
         dataset = ConcatDataSet(
-                root_dir = self.data_root + '-val',
-                num_of_data_sets = self.num_of_data_to_val,
-                window = self.window,
-                type_of_data= 'val',
-                should_test_the_new_data_set = self.should_test_the_new_data_set,
-                horizon = 1
-            )
+            root_dir=self.data_root + '-val',
+            num_of_data_sets=self.num_of_data_to_val,
+            window=self.window,
+            type_of_data='val',
+            should_test_the_new_data_set=self.should_test_the_new_data_set,
+            horizon=1
+        )
 
         loader = DataLoader(
-                    dataset,
-                    batch_size=self.batch_size,
-                    num_workers=1,
-                    pin_memory=True
-                )
+            dataset,
+            batch_size=self.batch_size,
+            num_workers=1,
+            pin_memory=True
+        )
 
         return loader
 
@@ -522,7 +536,6 @@ class PosLatent(pl.LightningModule):
         act_pos_hidden_concat = act_pos_hidden_concat.to(torch.device('cuda'))
         act_encoded = act_encoded.to(torch.device('cuda'))
 
-
         out = self.pred_pos['linear1'](act_pos_hidden_concat)
         out = self.pred_pos['linear2'](out)
         out = self.pred_pos['linear3'](out)
@@ -538,8 +551,7 @@ class PosLatent(pl.LightningModule):
         out = self.pred_pos['linear15'](out)
         out_pred_pos = self.pred_pos['linear16'](out)
 
-
-        out2 = self.pred_act['linear1'](act_encoded) # -> versao sem concat
+        out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
         # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
         out2 = self.pred_act['linear2'](out2)
         out2 = self.pred_act['linear3'](out2)
@@ -564,7 +576,8 @@ class PosLatent(pl.LightningModule):
 
     def get_actions(self, x):
         _, act_forecast = self.act_forecast(x)
-        act_forecast = act_forecast.view(act_forecast.shape[0], act_forecast.shape[2], act_forecast.shape[1])
+        act_forecast = act_forecast.view(
+            act_forecast.shape[0], act_forecast.shape[2], act_forecast.shape[1])
 
         return act_forecast
 
@@ -572,7 +585,6 @@ class PosLatent(pl.LightningModule):
         decoded = self.encoder.decoding(x, y_hist)
 
         return decoded
-
 
     def training_step(self, batch, batch_idx):
         self.train()
@@ -591,7 +603,6 @@ class PosLatent(pl.LightningModule):
 
         pred1, pred2 = self.forward(X)
 
-
         y_act = y_clone1[:, self.indexes_act].clone()
         y_pos = y_clone2[:, self.indexes].clone()
 
@@ -599,7 +610,7 @@ class PosLatent(pl.LightningModule):
 
         loss_pos = F.mse_loss(pred1, y_pos)
 
-        general_loss = self.weitght_pos * loss_pos +  self.weitght_acts * loss_act
+        general_loss = self.weitght_pos * loss_pos + self.weitght_acts * loss_act
 
         self.opt.zero_grad()
         self.manual_backward(general_loss)
@@ -610,7 +621,7 @@ class PosLatent(pl.LightningModule):
         total_norm = 0
         # layers = []
         for p in self.parameters():
-            if(p.requires_grad):
+            if (p.requires_grad):
                 # layers.append(n)
                 ave_grads.append(torch.max(torch.abs(p.grad)).item())
                 param_norm = p.grad.data.norm(2)
@@ -621,7 +632,6 @@ class PosLatent(pl.LightningModule):
         # ipdb.set_trace()
         self.opt.step()
 
-
         # pred_decoder = self.decoding(pred_copy, X)
 
         # pred_decoder = pred_decoder[:, -1, :]
@@ -631,15 +641,14 @@ class PosLatent(pl.LightningModule):
         # y_true = y_true.cpu().detach().numpy()
         # y_copy = y_copy.cpu().detach().numpy()
 
-
-        self.log_dict({ 'train/loss/general_loss': general_loss,
-                        'train/loss/loss_pos': loss_pos,
-                        'train/loss/loss_act': loss_act,
-                        'max_abs_gradients': max(ave_grads),
-                        'max_norm_gradients': max(norm_grad),
-                        'sum_norm_gradients': total_norm,
-                        # 'train/loss/general_loss_encoded': general_loss_encoded,
-                        })
+        self.log_dict({'train/loss/general_loss': general_loss,
+                       'train/loss/loss_pos': loss_pos,
+                       'train/loss/loss_act': loss_act,
+                       'max_abs_gradients': max(ave_grads),
+                       'max_norm_gradients': max(norm_grad),
+                       'sum_norm_gradients': total_norm,
+                       # 'train/loss/general_loss_encoded': general_loss_encoded,
+                       })
 
         return general_loss
 
@@ -656,17 +665,16 @@ class PosLatent(pl.LightningModule):
         y = y.squeeze()
 
         # y_copy = y_copy.cpu().detach().numpy()
-        
+
         y_act = y[:, self.indexes_act]
         y_pos = y[:, self.indexes]
-
 
         loss_pos = F.mse_loss(pred1, y_pos)
         loss_act = F.mse_loss(pred2, y_act)
 
         # y = y[:, self.indexes]
 
-        general_loss = self.weitght_pos * loss_pos +  self.weitght_acts * loss_act
+        general_loss = self.weitght_pos * loss_pos + self.weitght_acts * loss_act
 
         # pred_decoder = self.decoding(pred_copy, X)
 
@@ -685,15 +693,13 @@ class PosLatent(pl.LightningModule):
         # y_true = y_true.cpu().detach().numpy()
         # y_copy = y_copy.cpu().detach().numpy()
 
-
         if self.render:
 
             # render = RCGymRender(should_render_actual_ball = False, n_robots_blue = 3, n_robots_yellow = 3)
             Handle_render(self, False, name_predictor=f'pos_latent-eval-{self.global_step}',
-                            num_of_features=self.output_size, path=f'./gifs/train/train-{self.global_step}-3v3.gif',
-                            is_traning=True)\
-                                .render_n_steps_autoencoder3v3()
-
+                          num_of_features=self.output_size, path=f'./gifs/train/train-{self.global_step}-3v3.gif',
+                          is_traning=True)\
+                .render_n_steps_autoencoder3v3()
 
             self.render = False
             # frame = render.render_frame(
@@ -728,13 +734,13 @@ class PosLatent(pl.LightningModule):
             #     loop=0
             #     )
 
-        self.log_dict({ 'val/loss/general_loss': general_loss,
-                        'val/loss/loss_pos': loss_pos,
-                        'val/loss/loss_act': loss_act,
-                        # 'train/loss/general_loss_encoded': general_loss_encoded,
-                        })
+        self.log_dict({'val/loss/general_loss': general_loss,
+                       'val/loss/loss_pos': loss_pos,
+                       'val/loss/loss_act': loss_act,
+                       # 'train/loss/general_loss_encoded': general_loss_encoded,
+                       })
 
         return general_loss
 
     def configure_optimizers(self):
-        return Adam(self.parameters() , lr = self.lr)
+        return Adam(self.parameters(), lr=self.lr)
