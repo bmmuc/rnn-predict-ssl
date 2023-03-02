@@ -10,7 +10,7 @@ from datetime import datetime
 import pytz
 
 BATCH_SIZE = 256
-HIDDEN_SIZE = 512
+HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 36
 EPOCHS = 100
