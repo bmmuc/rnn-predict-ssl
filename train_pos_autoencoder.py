@@ -9,13 +9,13 @@ from tqdm import tqdm
 import pytz
 from datetime import datetime, timezone
 
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-3
+LR = 1e-4
 
 
 dataset = ConcatDataSetAutoencoder(
