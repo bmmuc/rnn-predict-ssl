@@ -47,11 +47,13 @@ class PosLatent(nn.Module):
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
             'linear4': nn.Linear(512, 512),
+            'dropout1': nn.Dropout(0.5),
             'linear5': nn.Linear(512, 512),
             'linear8': nn.Linear(512, 256),
             'linear9': nn.Linear(256, 256),
             'linear10': nn.Linear(256, 256),
             'linear11': nn.Linear(256, 256),
+            'dropout2': nn.Dropout(0.5),
             'linear12': nn.Linear(256, 256),
             'linear13': nn.Linear(256, 256),
             'linear14': nn.Linear(256, 256),
@@ -62,6 +64,7 @@ class PosLatent(nn.Module):
             'linear19': nn.Linear(256, 256),
             'linear20': nn.Linear(256, 256),
             'linear21': nn.Linear(256, 256),
+            'dropout3': nn.Dropout(0.5),
             'linear22': nn.Linear(256, hidden_size),
 
         })
@@ -226,11 +229,13 @@ class PosLatent(nn.Module):
         out = self.pred_pos['linear2'](out)
         out = self.pred_pos['linear3'](out)
         out = self.pred_pos['linear4'](out)
+        out = self.pred_pos['dropout1'](out)
         out = self.pred_pos['linear5'](out)
         out = self.pred_pos['linear8'](out)
         out = self.pred_pos['linear9'](out)
         out = self.pred_pos['linear10'](out)
         out = self.pred_pos['linear11'](out)
+        out = self.pred_pos['dropout2'](out)
         out = self.pred_pos['linear12'](out)
         out = self.pred_pos['linear13'](out)
         out = self.pred_pos['linear14'](out)
@@ -241,6 +246,7 @@ class PosLatent(nn.Module):
         out = self.pred_pos['linear19'](out)
         out = self.pred_pos['linear20'](out)
         out = self.pred_pos['linear21'](out)
+        out = self.pred_pos['dropout3'](out)
         out_pred_pos = self.pred_pos['linear22'](out)
 
         out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
@@ -407,4 +413,4 @@ class PosLatent(nn.Module):
         return log_dict
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.lr, weight_decay=0.0001)
+        return Adam(self.parameters(), lr=self.lr)
