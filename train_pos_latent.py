@@ -9,12 +9,12 @@ from tqdm import tqdm
 from datetime import datetime
 import pytz
 
-BATCH_SIZE = 128
-HIDDEN_SIZE = 256
+BATCH_SIZE = 2
+HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR=1e-3
+LR = 1e-3
 WEIGHTS = [1, 0]
 
 ACT_PATH = './model_act.pth'
@@ -26,11 +26,11 @@ dataset = ConcatDataSet(
 
 
 train_loader = DataLoader(
-            dataset,
-            shuffle= True,
-            batch_size=BATCH_SIZE,
-            num_workers=10,
-            pin_memory=True
+    dataset,
+    shuffle=True,
+    batch_size=BATCH_SIZE,
+    num_workers=10,
+    pin_memory=True
 )
 
 
@@ -39,36 +39,37 @@ dataset = ConcatDataSet(
 )
 
 val_loader = DataLoader(
-            dataset,
-            batch_size=BATCH_SIZE,
-            num_workers=10,
-            pin_memory=True
+    dataset,
+    batch_size=BATCH_SIZE,
+    num_workers=10,
+    pin_memory=True
 )
 
 model = PosLatent(
-    window= WINDOW_SIZE,
+    window=WINDOW_SIZE,
     input_size=INPUT_SIZE,
-    hidden_size= HIDDEN_SIZE,
+    hidden_size=HIDDEN_SIZE,
     output_size=INPUT_SIZE,
     weights=WEIGHTS,
-    act_path = ACT_PATH,
-    pos_path = POS_PATH,
+    act_path=ACT_PATH,
+    pos_path=POS_PATH,
     lr=LR,
 )
 
 # wandb.watch(model)
-today = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%Y-%m-%d_%H:%M:%S")
+today = datetime.now(pytz.timezone('America/Sao_Paulo')
+                     ).strftime("%Y-%m-%d_%H:%M:%S")
 
 wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"act_autoencoder_{today}",
            config={
-        "batch_size": BATCH_SIZE,
-        "hidden_size": HIDDEN_SIZE,
-        "window_size": WINDOW_SIZE,
-        "input_size": INPUT_SIZE,
-        "epochs": EPOCHS,
-        "lr": LR,
-        "weights": WEIGHTS,
-        })
+               "batch_size": BATCH_SIZE,
+               "hidden_size": HIDDEN_SIZE,
+               "window_size": WINDOW_SIZE,
+               "input_size": INPUT_SIZE,
+               "epochs": EPOCHS,
+               "lr": LR,
+               "weights": WEIGHTS,
+           })
 step = 0
 val_step = 0
 
@@ -89,7 +90,6 @@ for epoch in tqdm(range(EPOCHS)):
         pos_val_loss += loss['val/loss/loss_pos'].item()
         vel_val_loss += loss['val/loss/loss_act'].item()
 
-
     general_loss = 0
     pos_val_loss = 0
     vel_val_loss = 0
@@ -104,7 +104,7 @@ for epoch in tqdm(range(EPOCHS)):
         general_loss += loss['train/loss/general_loss'].item()
         pos_val_loss += loss['train/loss/loss_pos'].item()
         vel_val_loss += loss['train/loss/loss_act'].item()
-        
+
     log_dict = {
         'epoch': epochs,
         'train/loss/general_loss': general_loss / len(train_loader),
