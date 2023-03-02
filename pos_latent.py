@@ -407,4 +407,4 @@ class PosLatent(nn.Module):
         return log_dict
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.lr)
+        return Adam(self.parameters(), lr=self.lr, weight_decay=0.0001)
