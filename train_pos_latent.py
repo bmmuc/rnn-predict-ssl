@@ -63,7 +63,7 @@ model = PosLatent(
 today = datetime.now(pytz.timezone('America/Sao_Paulo')
                      ).strftime("%Y-%m-%d_%H:%M:%S")
 
-wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"act_autoencoder_{today}",
+wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"pred_with_out_grad_clip{today}",
            config={
                "batch_size": BATCH_SIZE,
                "hidden_size": HIDDEN_SIZE,

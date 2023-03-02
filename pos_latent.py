@@ -294,7 +294,7 @@ class PosLatent(nn.Module):
         self.opt.zero_grad()
 
         general_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.parameters(), 0.0175)
+        # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.0175)
 
         self.opt.step()
 
