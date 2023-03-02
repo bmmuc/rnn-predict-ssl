@@ -9,12 +9,13 @@ from tqdm import tqdm
 from datetime import datetime
 import pytz
 
-BATCH_SIZE = 2
+BATCH_SIZE = 256
 HIDDEN_SIZE = 512
+POS_HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR = 1e-3
+LR = 1e-5
 WEIGHTS = [1, 0]
 
 ACT_PATH = './model_act.pth'
@@ -52,6 +53,7 @@ model = PosLatent(
     output_size=INPUT_SIZE,
     weights=WEIGHTS,
     act_path=ACT_PATH,
+    pos_hidden_size=POS_HIDDEN_SIZE,
     pos_path=POS_PATH,
     lr=LR,
 )

@@ -12,13 +12,16 @@ from src.aux_idx import Aux
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 class PosLatent(nn.Module):
-    def __init__(self, window=10, input_size=10, hidden_size=256,
+    def __init__(self, window=10, input_size=10,
+                 hidden_size=256,
+                 pos_hidden_size=256,
                  output_size=20,
-                 weights = (0.5, 0.5),
-                 act_path = '',
-                 pos_path = '',
-                 lr= 1e-3,
+                 weights=(0.5, 0.5),
+                 act_path='',
+                 pos_path='',
+                 lr=1e-3,
                  ):
         super().__init__()
 
@@ -28,17 +31,19 @@ class PosLatent(nn.Module):
         self.automatic_optimization = False
         self.device = device
 
-        self.pos_autoencoder = PositionAutoEncoder(window=window, input_size=38, hidden_size=hidden_size + 256, output_size=38)
+        self.pos_autoencoder = PositionAutoEncoder(
+            window=window, input_size=38, hidden_size=pos_hidden_size, output_size=38)
         self.pos_autoencoder.load_state_dict(torch.load(pos_path))
 
-        self.act_autoencoder = ActAutoEncoder(window=self.window, input_size=36, hidden_size=hidden_size, output_size=36)
+        self.act_autoencoder = ActAutoEncoder(
+            window=self.window, input_size=36, hidden_size=hidden_size, output_size=36)
         self.act_autoencoder.load_state_dict(torch.load(act_path))
 
         self.pos_autoencoder = self.pos_autoencoder.eval()
         self.act_autoencoder = self.act_autoencoder.eval()
 
         self.pred_pos = nn.ModuleDict({
-            'linear1': nn.Linear(512, 1024),
+            'linear1': nn.Linear(pos_hidden_size + hidden_size, 1024),
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
             'linear4': nn.Linear(512, 512),
@@ -51,12 +56,13 @@ class PosLatent(nn.Module):
             'linear13': nn.Linear(256, 256),
             'linear14': nn.Linear(256, 256),
             'linear15': nn.Linear(256, 256),
-            'linear16': nn.Linear(256, 256),
+            'linear16': nn.Linear(256, pos_hidden_size),
 
         })
 
         self.pred_act = nn.ModuleDict({
-            'linear1': nn.Linear(256, 1024), # estrutura pos => (512, 1024)
+            # estrutura pos => (512, 1024)
+            'linear1': nn.Linear(hidden_size, 1024),
             # 'linear1': nn.Linear(512, 1024), # estrutura pos + act => (512, 1024)
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
@@ -66,10 +72,10 @@ class PosLatent(nn.Module):
             'linear7': nn.Linear(256, 256),
             'linear8': nn.Linear(256, 256),
             'linear9': nn.Linear(256, 256),
-            'linear10': nn.Linear(256, 256),
+            'linear10': nn.Linear(256, hidden_size),
         })
 
-        self.opt = self.configure_optimizers() # testar 2 optimizers
+        self.opt = self.configure_optimizers()  # testar 2 optimizers
 
         self.weitght_pos = weights[0]
         self.weitght_acts = weights[1]
@@ -81,7 +87,7 @@ class PosLatent(nn.Module):
         self.render = False
 
         self.indexes_act = Aux.is_vel
-        #self.indexes will be not self.indexes_act
+        # self.indexes will be not self.indexes_act
         self.indexes = []
 
         for value in self.indexes_act:
@@ -133,14 +139,15 @@ class PosLatent(nn.Module):
             y_hist_pos = y_hist[:, :, self.indexes]
             y_hist_act = y_hist[:, :, self.indexes_act]
 
-
             act_encoded = self.act_autoencoder.encoding(x_hist)
 
             pos_encoded = self.pos_autoencoder.encoding(x_hist)
 
-            act_pos_hidden_concat = torch.cat((act_encoded, pos_encoded), dim=2)
+            act_pos_hidden_concat = torch.cat(
+                (act_encoded, pos_encoded), dim=2)
 
-            act_pos_hidden_concat = act_pos_hidden_concat.to(torch.device('cuda'))
+            act_pos_hidden_concat = act_pos_hidden_concat.to(
+                torch.device('cuda'))
             act_encoded = act_encoded.to(torch.device('cuda'))
 
             # next_act_hidden = act_encoded.clone()
@@ -165,24 +172,25 @@ class PosLatent(nn.Module):
             #         # act_encoded = next_act_hidden
             #         # ate aq
 
-
             for i in range(n_steps):
-                    next_pos_hidden = self.run_pos(act_pos_hidden_concat)
-                    next_act_hidden = self.run_act(act_pos_hidden_concat) # -> usar quando for a estrutura pos + act
-                    # next_act_hidden = self.run_act(act_encoded)
+                next_pos_hidden = self.run_pos(act_pos_hidden_concat)
+                # -> usar quando for a estrutura pos + act
+                next_act_hidden = self.run_act(act_pos_hidden_concat)
+                # next_act_hidden = self.run_act(act_encoded)
 
+                act_pos_hidden_concat = torch.cat(
+                    (next_act_hidden, next_pos_hidden), dim=2)
+                act_encoded = next_act_hidden
 
-                    act_pos_hidden_concat = torch.cat((next_act_hidden, next_pos_hidden), dim=2)
-                    act_encoded = next_act_hidden
+            # y_hist_pos = self.pos_autoencoder.decoding(next_pos_hidden, y_hist_pos)
+            # y_hist_act = self.act_autoencoder.decoding(act_encoded, y_hist_act)
 
-                # y_hist_pos = self.pos_autoencoder.decoding(next_pos_hidden, y_hist_pos)
-                # y_hist_act = self.act_autoencoder.decoding(act_encoded, y_hist_act)
+            pos_decoded = self.pos_autoencoder.decoding(
+                next_pos_hidden, y_hist_pos)
+            act_decoded = self.act_autoencoder.decoding(
+                next_act_hidden, y_hist_act)
 
-            pos_decoded = self.pos_autoencoder.decoding(next_pos_hidden, y_hist_pos)
-            act_decoded = self.act_autoencoder.decoding(next_act_hidden, y_hist_act)
-
-        return pos_decoded, act_decoded    
-
+        return pos_decoded, act_decoded
 
     def forward(self, x):
         # ipdb.set_trace()
@@ -208,7 +216,6 @@ class PosLatent(nn.Module):
         act_pos_hidden_concat = act_pos_hidden_concat.to(torch.device('cuda'))
         act_encoded = act_encoded.to(torch.device('cuda'))
 
-
         out = self.pred_pos['linear1'](act_pos_hidden_concat)
         out = self.pred_pos['linear2'](out)
         out = self.pred_pos['linear3'](out)
@@ -224,8 +231,7 @@ class PosLatent(nn.Module):
         out = self.pred_pos['linear15'](out)
         out_pred_pos = self.pred_pos['linear16'](out)
 
-
-        out2 = self.pred_act['linear1'](act_encoded) # -> versao sem concat
+        out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
         # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
         out2 = self.pred_act['linear2'](out2)
         out2 = self.pred_act['linear3'](out2)
@@ -250,7 +256,8 @@ class PosLatent(nn.Module):
 
     def get_actions(self, x):
         _, act_forecast = self.act_forecast(x)
-        act_forecast = act_forecast.view(act_forecast.shape[0], act_forecast.shape[2], act_forecast.shape[1])
+        act_forecast = act_forecast.view(
+            act_forecast.shape[0], act_forecast.shape[2], act_forecast.shape[1])
 
         return act_forecast
 
@@ -258,7 +265,6 @@ class PosLatent(nn.Module):
         decoded = self.encoder.decoding(x, y_hist)
 
         return decoded
-
 
     def training_step(self, X, y):
         self.train()
@@ -276,7 +282,6 @@ class PosLatent(nn.Module):
 
         pred1, pred2 = self.forward(X)
 
-
         y_act = y_clone1[:, self.indexes_act].clone()
         y_pos = y_clone2[:, self.indexes].clone()
 
@@ -284,7 +289,7 @@ class PosLatent(nn.Module):
 
         loss_pos = F.mse_loss(pred1, y_pos)
 
-        general_loss = self.weitght_pos * loss_pos +  self.weitght_acts * loss_act
+        general_loss = self.weitght_pos * loss_pos + self.weitght_acts * loss_act
 
         self.opt.zero_grad()
 
@@ -298,7 +303,7 @@ class PosLatent(nn.Module):
         total_norm = 0
         # layers = []
         for p in self.parameters():
-            if(p.requires_grad):
+            if (p.requires_grad):
                 # layers.append(n)
                 ave_grads.append(torch.max(torch.abs(p.grad)).item())
                 param_norm = p.grad.data.norm(2)
@@ -307,14 +312,14 @@ class PosLatent(nn.Module):
                 norm_grad.append(torch.norm(p.grad).item())
         total_norm = total_norm ** (1. / 2)
 
-        log_dict = { 'train/loss/general_loss': general_loss,
-                        'train/loss/loss_pos': loss_pos,
-                        'train/loss/loss_act': loss_act,
-                        'max_abs_gradients': max(ave_grads),
-                        'max_norm_gradients': max(norm_grad),
-                        'sum_norm_gradients': total_norm,
-                        # 'train/loss/general_loss_encoded': general_loss_encoded,
-                        }
+        log_dict = {'train/loss/general_loss': general_loss,
+                    'train/loss/loss_pos': loss_pos,
+                    'train/loss/loss_act': loss_act,
+                    'max_abs_gradients': max(ave_grads),
+                    'max_norm_gradients': max(norm_grad),
+                    'sum_norm_gradients': total_norm,
+                    # 'train/loss/general_loss_encoded': general_loss_encoded,
+                    }
 
         return log_dict
 
@@ -329,17 +334,16 @@ class PosLatent(nn.Module):
         y = y.squeeze()
 
         # y_copy = y_copy.cpu().detach().numpy()
-        
+
         y_act = y[:, self.indexes_act]
         y_pos = y[:, self.indexes]
-
 
         loss_pos = F.mse_loss(pred1, y_pos)
         loss_act = F.mse_loss(pred2, y_act)
 
         # y = y[:, self.indexes]
 
-        general_loss = self.weitght_pos * loss_pos +  self.weitght_acts * loss_act
+        general_loss = self.weitght_pos * loss_pos + self.weitght_acts * loss_act
 
         # if self.render:
 
@@ -348,7 +352,6 @@ class PosLatent(nn.Module):
         #                     num_of_features=self.output_size, path=f'./gifs/train/train-{self.global_step}-3v3.gif',
         #                     is_traning=True)\
         #                         .render_n_steps_autoencoder3v3()
-
 
         #     self.render = False
         #     # frame = render.render_frame(
@@ -383,13 +386,13 @@ class PosLatent(nn.Module):
         #     #     loop=0
         #     #     )
 
-        log_dict = { 'val/loss/general_loss': general_loss,
-                        'val/loss/loss_pos': loss_pos,
-                        'val/loss/loss_act': loss_act,
-                        # 'train/loss/general_loss_encoded': general_loss_encoded,
-                        }
+        log_dict = {'val/loss/general_loss': general_loss,
+                    'val/loss/loss_pos': loss_pos,
+                    'val/loss/loss_act': loss_act,
+                    # 'train/loss/general_loss_encoded': general_loss_encoded,
+                    }
 
         return log_dict
 
     def configure_optimizers(self):
-        return Adam(self.parameters() , lr = self.lr)
+        return Adam(self.parameters(), lr=self.lr)
