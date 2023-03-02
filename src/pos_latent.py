@@ -540,15 +540,18 @@ class PosLatent(pl.LightningModule):
         out = self.pred_pos['linear2'](out)
         out = self.pred_pos['linear3'](out)
         out = self.pred_pos['linear4'](out)
+        out = self.pred_pos['dropout1'](out)
         out = self.pred_pos['linear5'](out)
         out = self.pred_pos['linear8'](out)
         out = self.pred_pos['linear9'](out)
         out = self.pred_pos['linear10'](out)
+        out = self.pred_pos['dropout2'](out)
         out = self.pred_pos['linear11'](out)
         out = self.pred_pos['linear12'](out)
         out = self.pred_pos['linear13'](out)
         out = self.pred_pos['linear14'](out)
         out = self.pred_pos['linear15'](out)
+
         out_pred_pos = self.pred_pos['linear16'](out)
 
         out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
