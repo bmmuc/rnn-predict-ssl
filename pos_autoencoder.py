@@ -252,7 +252,7 @@ class PositionAutoEncoder(nn.Module):
         super().__init__()
         self.batch_size = batch_size
 
-        self.encoder = AttnEncoder(input_size, hidden_size, window, True)
+        self.encoder = AttnEncoder(input_size, hidden_size, window, False)
         self.decoder = AttnDecoder(
             hidden_size, hidden_size, window, output_size, False)
 

@@ -14,7 +14,7 @@ class ConcatDataSet(Dataset):
         [sample, next_sample]
     """
     def __init__(self, 
-                root_dir =  './datasets_full/', 
+                root_dir =  './datasets_full_games/', 
                 type_of_data = 'train',
                 ):
 
@@ -36,8 +36,8 @@ class ConcatDataSet(Dataset):
     def init_dataset(self):
         print(f'Loading the {self.type} data set...')
 
-        self.data_windows = np.load(f'{self.root_dir}/{self.type}_data_windows_full.npy')
-        self.data_labels = np.load(f'{self.root_dir}/{self.type}_data_labels_full.npy')
+        self.data_windows = np.load(f'{self.root_dir}/{self.type}_data_windows_full_games.npy')
+        self.data_labels = np.load(f'{self.root_dir}/{self.type}_data_labels_full_games.npy')
 
         print(f'Loaded the {self.type} data set')
 
