@@ -12,10 +12,11 @@ import pytz
 BATCH_SIZE = 256
 HIDDEN_SIZE = 512
 POS_HIDDEN_SIZE = 512
-WINDOW_SIZE = 10
+WINDOW_SIZE = NUM_WORKERS
 INPUT_SIZE = 74
 EPOCHS = 100
 LR = 1e-5
+NUM_WORKERS = 15
 WEIGHTS = [1, 0]
 
 ACT_PATH = './model_act.pth'
@@ -30,7 +31,7 @@ train_loader = DataLoader(
     dataset,
     shuffle=True,
     batch_size=BATCH_SIZE,
-    num_workers=10,
+    num_workers=NUM_WORKERS,
     pin_memory=True
 )
 
@@ -42,7 +43,7 @@ dataset = ConcatDataSet(
 val_loader = DataLoader(
     dataset,
     batch_size=BATCH_SIZE,
-    num_workers=10,
+    num_workers=NUM_WORKERS,
     pin_memory=True
 )
 
