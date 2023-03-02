@@ -28,7 +28,7 @@ class PosLatent(nn.Module):
         self.automatic_optimization = False
         self.device = device
 
-        self.pos_autoencoder = PositionAutoEncoder(window=window, input_size=38, hidden_size=hidden_size, output_size=38)
+        self.pos_autoencoder = PositionAutoEncoder(window=window, input_size=38, hidden_size=hidden_size + 256, output_size=38)
         self.pos_autoencoder.load_state_dict(torch.load(pos_path))
 
         self.act_autoencoder = ActAutoEncoder(window=self.window, input_size=36, hidden_size=hidden_size, output_size=36)
