@@ -86,7 +86,7 @@ class AttnEncoder(nn.Module):
         )
         self.softmax = nn.Softmax(dim=1)
 
-    def _get_noise(self, input_data: torch.Tensor, sigma=0.01, p=0.0):
+    def _get_noise(self, input_data: torch.Tensor, sigma=0.01, p=0.15):
         """
         Get noise.
         Args:
@@ -252,7 +252,7 @@ class PositionAutoEncoder(nn.Module):
         super().__init__()
         self.batch_size = batch_size
 
-        self.encoder = AttnEncoder(input_size, hidden_size, window, False)
+        self.encoder = AttnEncoder(input_size, hidden_size, window, True)
         self.decoder = AttnDecoder(
             hidden_size, hidden_size, window, output_size, False)
 
