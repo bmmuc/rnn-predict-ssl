@@ -50,12 +50,12 @@ class PosLatent(nn.Module):
             'linear5': nn.Linear(512, 512),
             'linear8': nn.Linear(512, 256),
             'linear9': nn.Linear(256, 256),
-            'linear10': nn.Linear(256, 256),
-            'linear11': nn.Linear(256, 256),
-            'linear12': nn.Linear(256, 256),
-            'linear13': nn.Linear(256, 256),
-            'linear14': nn.Linear(256, 256),
-            'linear15': nn.Linear(256, 256),
+            # 'linear10': nn.Linear(256, 256),
+            # 'linear11': nn.Linear(256, 256),
+            # 'linear12': nn.Linear(256, 256),
+            # 'linear13': nn.Linear(256, 256),
+            # 'linear14': nn.Linear(256, 256),
+            # 'linear15': nn.Linear(256, 256),
             'linear16': nn.Linear(256, pos_hidden_size),
 
         })
@@ -223,12 +223,12 @@ class PosLatent(nn.Module):
         out = self.pred_pos['linear5'](out)
         out = self.pred_pos['linear8'](out)
         out = self.pred_pos['linear9'](out)
-        out = self.pred_pos['linear10'](out)
-        out = self.pred_pos['linear11'](out)
-        out = self.pred_pos['linear12'](out)
-        out = self.pred_pos['linear13'](out)
-        out = self.pred_pos['linear14'](out)
-        out = self.pred_pos['linear15'](out)
+        # out = self.pred_pos['linear10'](out)
+        # out = self.pred_pos['linear11'](out)
+        # out = self.pred_pos['linear12'](out)
+        # out = self.pred_pos['linear13'](out)
+        # out = self.pred_pos['linear14'](out)
+        # out = self.pred_pos['linear15'](out)
         out_pred_pos = self.pred_pos['linear16'](out)
 
         out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
