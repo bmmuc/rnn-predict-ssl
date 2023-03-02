@@ -9,13 +9,13 @@ from tqdm import tqdm
 from datetime import datetime
 import pytz
 
-BATCH_SIZE = 512
+BATCH_SIZE = 256
 HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 INPUT_SIZE = 36
 EPOCHS = 100
 NUM_WORKERS = 15
-LR = 1e-6
+LR = 1e-4
 HORIZON_SIZE = 1
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
