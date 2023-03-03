@@ -37,7 +37,7 @@ class RCGymRender:
                  n_robots_yellow: int = 1,
                  field_params=None,
                  simulator: str = 'vss',
-                 width: int = 750,
+                 width: int = 950,
                  height: int = 650,
                  should_render_actual_ball=True) -> None:
         '''
@@ -73,10 +73,10 @@ class RCGymRender:
         self.blue_robots: List[rendering.Transform] = []
         self.yellow_robots: List[rendering.Transform] = []
         self.should_render_actual_ball = should_render_actual_ball
-        self.max_pos = max(self.field.width / 2, (self.field.length / 2)
+        self.max_pos = max(6 / 2, (9 / 2)
                            + self.field.penalty_length)
-        print(self.field.width)
-        print(self.field.length)
+        print(6)
+        print(9)
         # print(self.max_pos)
         # ipdb.set_trace()
         # self.max_pos = 1.2
@@ -116,9 +116,9 @@ class RCGymRender:
         # Window margin
         margin = 0.05 if simulator == "vss" else 0.35
         # Half field width
-        h_len = (self.field.length + 2*self.field.goal_depth) / 2
+        h_len = (9 + 2*self.field.goal_depth) / 2
         # Half field height
-        h_wid = self.field.width / 2
+        h_wid = 6 / 2
 
         self.linewidth = 3
 
@@ -207,7 +207,10 @@ class RCGymRender:
         ball_actual_y, _ = self.denorm_data(ball_actual_y, 'ball_actual_y')
         ball_true_x, _ = self.denorm_data(ball_true_x, 'ball_true_x')
         ball_true_y, _ = self.denorm_data(ball_true_y, 'ball_true_y')
-
+        # ball_actual_x = ball_actual_x
+        # ball_actual_y = ball_actual_y
+        # ball_true_x = ball_true_x
+        # ball_true_y = ball_true_y
         # ball_pred_x, _ = self.denorm_data(ball_pred_x, 'ball_pred_x')
         # ball_pred_y, _ = self.denorm_data(ball_pred_y, 'ball_pred_y')
 
@@ -220,23 +223,23 @@ class RCGymRender:
                 value, find = self.denorm_data(pred, col)
                 if find == 'x':
                     if team == 'blue':
-                        x_pos_blue.append(pred)
+                        x_pos_blue.append(value)
                     elif team == 'yellow':
-                        x_pos_yellow.append(pred)
+                        x_pos_yellow.append(value)
                     else:
                         print('não atuando em: ', col)
                 elif find == 'y':
                     if team == 'blue':
-                        y_pos_blue.append(pred)
+                        y_pos_blue.append(value)
                     elif team == 'yellow':
-                        y_pos_yellow.append(pred)
+                        y_pos_yellow.append(value)
                     else:
                         print('não atuando em: ', col)
                 elif find == 'orientation':
                     if team == 'blue':
-                        theta_blue.append(pred)
+                        theta_blue.append(value)
                     elif team == 'yellow':
-                        theta_yellow.append(pred)
+                        theta_yellow.append(value)
                     else:
                         print('não atuando em: ', col)
 
@@ -272,13 +275,13 @@ class RCGymRender:
         field_margin = 0.3
 
         # Vertical Lines X
-        x_border = self.field.length / 2
+        x_border = 9 / 2
         x_goal = x_border + self.field.goal_depth
         x_penalty = x_border - self.field.penalty_length
         x_center = 0
 
         # Horizontal Lines Y
-        y_border = self.field.width / 2
+        y_border = 6 / 2
         y_penalty = self.field.penalty_width / 2
         y_goal = self.field.goal_width / 2
 
@@ -604,8 +607,8 @@ if __name__ == '__main__':
             pass
         return data
 
-    # for colmn_name in columns_to_get:
-    #     data = normalize_data(data, colmn_name)
+    for colmn_name in columns_to_get:
+        data = normalize_data(data, colmn_name)
     data = data.values
     # ipdb.set_trace()
     render = RCGymRender(6, 6, simulator='ssl')
