@@ -9,13 +9,13 @@ from tqdm import tqdm
 from datetime import datetime
 import pytz
 
-BATCH_SIZE = 512
+BATCH_SIZE = 128
 HIDDEN_SIZE = 512
 POS_HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR = 1e-5
+LR = 1e-4
 NUM_WORKERS = 15
 WEIGHTS = [0.9, 0.1]
 
@@ -63,7 +63,7 @@ model = PosLatent(
 today = datetime.now(pytz.timezone('America/Sao_Paulo')
                      ).strftime("%Y-%m-%d_%H:%M:%S")
 
-wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"dropouts_{today}",
+wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"full_model_{today}",
            config={
                "batch_size": BATCH_SIZE,
                "hidden_size": HIDDEN_SIZE,
@@ -79,6 +79,7 @@ val_step = 0
 
 steps = 0
 epochs = 0
+
 for epoch in tqdm(range(EPOCHS)):
     wandb.log({'epoch': epochs})
     general_val_loss = 0
@@ -123,4 +124,4 @@ for epoch in tqdm(range(EPOCHS)):
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), './model_pred.pth')
+torch.save(model.state_dict(), f'./model_pred_{today}.pth')
