@@ -9,7 +9,7 @@ from tqdm import tqdm
 from datetime import datetime
 import pytz
 
-BATCH_SIZE = 256
+BATCH_SIZE = 512
 HIDDEN_SIZE = 512
 POS_HIDDEN_SIZE = 512
 WINDOW_SIZE = 10
@@ -17,7 +17,7 @@ INPUT_SIZE = 74
 EPOCHS = 100
 LR = 1e-5
 NUM_WORKERS = 15
-WEIGHTS = [0.5, 0.5]
+WEIGHTS = [0.9, 0.1]
 
 ACT_PATH = './model_act.pth'
 POS_PATH = './model_pos.pth'
@@ -73,6 +73,7 @@ wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"dropouts_{t
                "lr": LR,
                "weights": WEIGHTS,
            })
+
 step = 0
 val_step = 0
 
@@ -96,6 +97,7 @@ for epoch in tqdm(range(EPOCHS)):
     general_loss = 0
     pos_val_loss = 0
     vel_val_loss = 0
+
     for x, y in tqdm(train_loader):
         x = x.to(model.device)
         y = y.to(model.device)
