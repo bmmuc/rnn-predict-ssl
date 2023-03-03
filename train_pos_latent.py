@@ -8,6 +8,7 @@ import ipdb
 from tqdm import tqdm
 from datetime import datetime
 import pytz
+import os
 
 BATCH_SIZE = 128
 HIDDEN_SIZE = 512
@@ -62,6 +63,11 @@ model = PosLatent(
 # wandb.watch(model)
 today = datetime.now(pytz.timezone('America/Sao_Paulo')
                      ).strftime("%Y-%m-%d_%H:%M:%S")
+
+os.makedirs(f'./results/{today}', exist_ok=True)
+files = os.listdir(f'./results/{today}')
+
+os.makedirs(f'./results/{today}/{len(files)}/', exist_ok=True)
 
 wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"full_model_{today}",
            config={
@@ -123,5 +129,10 @@ for epoch in tqdm(range(EPOCHS)):
 
     wandb.log(log_dict)
     epochs += 1
+    if epoch % 10 == 0:
+        torch.save(model.state_dict(),
+                   f'./results/{today}/{len(files)}/checkpoint_{epoch}.pth')
 
-torch.save(model.state_dict(), f'./model_pred_{today}.pth')
+
+torch.save(model.state_dict(),
+           f'./results/{today}/{len(files)}/checkpoint_final.pth')

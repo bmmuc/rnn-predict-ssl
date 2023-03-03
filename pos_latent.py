@@ -9,7 +9,7 @@ from act_autoencoder import ActAutoEncoder
 from pos_autoencoder import PositionAutoEncoder
 
 from src.aux_idx import Aux
-
+import ipdb
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -104,21 +104,29 @@ class PosLatent(nn.Module):
 
     def run_pos(self, act_pos_hidden_concat):
         with torch.no_grad():
-
             out = self.pred_pos['linear1'](act_pos_hidden_concat)
             out = self.pred_pos['linear2'](out)
             out = self.pred_pos['linear3'](out)
             out = self.pred_pos['linear4'](out)
+            # out = self.pred_pos['dropout1'](out)
             out = self.pred_pos['linear5'](out)
             out = self.pred_pos['linear8'](out)
             out = self.pred_pos['linear9'](out)
             out = self.pred_pos['linear10'](out)
             out = self.pred_pos['linear11'](out)
+            # out = self.pred_pos['dropout2'](out)
             out = self.pred_pos['linear12'](out)
             out = self.pred_pos['linear13'](out)
             out = self.pred_pos['linear14'](out)
             out = self.pred_pos['linear15'](out)
-            out_pred_pos = self.pred_pos['linear16'](out)
+            out = self.pred_pos['linear16'](out)
+            out = self.pred_pos['linear17'](out)
+            out = self.pred_pos['linear18'](out)
+            out = self.pred_pos['linear19'](out)
+            out = self.pred_pos['linear20'](out)
+            out = self.pred_pos['linear21'](out)
+            # out = self.pred_pos['dropout3'](out)
+            out_pred_pos = self.pred_pos['linear22'](out)
 
         return out_pred_pos
 
@@ -139,7 +147,7 @@ class PosLatent(nn.Module):
         return out_pred_act
 
     def predict_n_steps(self, x_hist, n_steps):
-        # ipdb.set_trace()
+        ipdb.set_trace()
         with torch.no_grad():
             x_hist = torch.FloatTensor(x_hist).to(torch.device('cuda'))
             x_hist = x_hist.view(1, x_hist.shape[0], x_hist.shape[1])
@@ -184,8 +192,8 @@ class PosLatent(nn.Module):
             for i in range(n_steps):
                 next_pos_hidden = self.run_pos(act_pos_hidden_concat)
                 # -> usar quando for a estrutura pos + act
-                next_act_hidden = self.run_act(act_pos_hidden_concat)
-                # next_act_hidden = self.run_act(act_encoded)
+                # next_act_hidden = self.run_act(act_pos_hidden_concat)
+                next_act_hidden = self.run_act(act_encoded)
 
                 act_pos_hidden_concat = torch.cat(
                     (next_act_hidden, next_pos_hidden), dim=2)
