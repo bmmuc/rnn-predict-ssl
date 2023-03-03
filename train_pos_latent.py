@@ -36,12 +36,12 @@ train_loader = DataLoader(
 )
 
 
-dataset = ConcatDataSet(
+dataset_val = ConcatDataSet(
     type_of_data='val',
 )
 
 val_loader = DataLoader(
-    dataset,
+    dataset_val,
     batch_size=BATCH_SIZE,
     num_workers=NUM_WORKERS,
     pin_memory=True
