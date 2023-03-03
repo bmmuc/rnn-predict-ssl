@@ -43,8 +43,8 @@ class PosLatent(nn.Module):
         self.act_autoencoder = self.act_autoencoder.eval()
 
         self.pred_pos = nn.ModuleDict({
-            'linear1': nn.Linear(pos_hidden_size + hidden_size, 1024),
-            'linear2': nn.Linear(1024, 512),
+            'linear1': nn.Linear(pos_hidden_size + hidden_size, pos_hidden_size),
+            # 'linear2': nn.Linear(1024, 512),
             # 'linear3': nn.Linear(512, 512),
             # 'linear4': nn.Linear(512, 512),
             # 'dropout1': nn.Dropout(0.5),
@@ -64,8 +64,8 @@ class PosLatent(nn.Module):
             # 'linear19': nn.Linear(256, 256),
             # 'linear20': nn.Linear(256, 256),
             # 'linear21': nn.Linear(256, 256),
-            'dropout3': nn.Dropout(0.5),
-            'linear22': nn.Linear(512, pos_hidden_size),
+            # 'dropout3': nn.Dropout(0.5),
+            # 'linear22': nn.Linear(512, pos_hidden_size),
 
         })
 
@@ -225,8 +225,8 @@ class PosLatent(nn.Module):
         act_pos_hidden_concat = act_pos_hidden_concat.to(torch.device('cuda'))
         act_encoded = act_encoded.to(torch.device('cuda'))
 
-        out = self.pred_pos['linear1'](act_pos_hidden_concat)
-        out = self.pred_pos['linear2'](out)
+        out_pred_pos = self.pred_pos['linear1'](act_pos_hidden_concat)
+        # out = self.pred_pos['linear2'](out)
         # out = self.pred_pos['linear3'](out)
         # out = self.pred_pos['linear4'](out)
         # out = self.pred_pos['dropout1'](out)
@@ -246,8 +246,8 @@ class PosLatent(nn.Module):
         # out = self.pred_pos['linear19'](out)
         # out = self.pred_pos['linear20'](out)
         # out = self.pred_pos['linear21'](out)
-        out = self.pred_pos['dropout3'](out)
-        out_pred_pos = self.pred_pos['linear22'](out)
+        # out = self.pred_pos['dropout3'](out)
+        # out_pred_pos = self.pred_pos['linear22'](out)
 
         out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
         # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
