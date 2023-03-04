@@ -10,13 +10,13 @@ import pytz
 from datetime import datetime, timezone
 import os
 
-BATCH_SIZE = 64
+BATCH_SIZE = 256
 HIDDEN_SIZE = 512
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-4
+LR = 1e-3
 
 NUM_WORKERS = 20
 
@@ -121,8 +121,8 @@ for epoch in tqdm(range(EPOCHS)):
     }
     if epoch % 10 == 0:
         torch.save(model.state_dict(),
-                   f'./results/pos_autoencoder/checkpoint_{epoch}.pth')
+                   f'./results/pos_autoencoder/{today}/checkpoint_{epoch}.pth')
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), f'./50_less_bt_lr_model_pos_{today}.pth')
+torch.save(model.state_dict(), f'./results/pos_autoencoder/{today}/final.pth')
