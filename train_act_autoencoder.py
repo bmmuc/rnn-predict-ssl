@@ -11,7 +11,7 @@ import pytz
 
 BATCH_SIZE = 256
 HIDDEN_SIZE = 256
-WINDOW_SIZE = 10
+WINDOW_SIZE = 50
 INPUT_SIZE = 36
 EPOCHS = 100
 NUM_WORKERS = 15
@@ -29,11 +29,11 @@ dataset = ConcatDataSetAutoencoder(
 
 
 train_loader = DataLoader(
-            dataset,
-            shuffle= True,
-            batch_size=BATCH_SIZE,
-            num_workers=NUM_WORKERS,
-            pin_memory=True
+    dataset,
+    shuffle=True,
+    batch_size=BATCH_SIZE,
+    num_workers=NUM_WORKERS,
+    pin_memory=True
 )
 
 
@@ -48,31 +48,32 @@ dataset = ConcatDataSetAutoencoder(
 )
 
 val_loader = DataLoader(
-            dataset,
-            batch_size=BATCH_SIZE,
-            num_workers=NUM_WORKERS,
-            pin_memory=True
+    dataset,
+    batch_size=BATCH_SIZE,
+    num_workers=NUM_WORKERS,
+    pin_memory=True
 )
 # raise Exception('stop')
 model = ActAutoEncoder(
-    window= WINDOW_SIZE,
+    window=WINDOW_SIZE,
     input_size=INPUT_SIZE,
-    hidden_size= HIDDEN_SIZE,
+    hidden_size=HIDDEN_SIZE,
     output_size=INPUT_SIZE,
     lr=LR,
 )
-today = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%Y-%m-%d_%H:%M:%S")
+today = datetime.now(pytz.timezone('America/Sao_Paulo')
+                     ).strftime("%Y-%m-%d_%H:%M:%S")
 
 wandb.init(project="ssl_env_acts", entity="breno-cavalcanti", name=f"act_autoencoder_{today}",
            config={
-        "batch_size": BATCH_SIZE,
-        "hidden_size": HIDDEN_SIZE,
-        "window_size": WINDOW_SIZE,
-        "input_size": INPUT_SIZE,
-        "epochs": EPOCHS,
-        "lr": LR,
-        "horizon": HORIZON_SIZE
-        })
+               "batch_size": BATCH_SIZE,
+               "hidden_size": HIDDEN_SIZE,
+               "window_size": WINDOW_SIZE,
+               "input_size": INPUT_SIZE,
+               "epochs": EPOCHS,
+               "lr": LR,
+               "horizon": HORIZON_SIZE
+           })
 
 wandb.define_metric("epoch")
 
@@ -107,7 +108,6 @@ for epoch in tqdm(range(EPOCHS)):
 
         general_loss += loss.item()
 
-        
     log_dict = {
         'loss_act_train/epoch': general_loss / len(train_loader),
         'loss_act_val/epoch': general_val_loss / len(val_loader),

@@ -83,7 +83,7 @@ class ConcatDataSetAutoencoder(Dataset):
         #     self.data_windows = np.load(f'./datasets/{self.type}_data_windows.npy', allow_pickle=True)
         # else:
         self.data_windows = np.load(
-            f'./datasets_full_games/{self.type}_data_windows_full_games.npy', allow_pickle=True)
+            f'./datas/{self.window}/{self.type}_data_windows_full_games_reduced.npy', allow_pickle=True)
         # ipdb.set_trace()
         print(f'Loaded the {self.type} data set')
 
