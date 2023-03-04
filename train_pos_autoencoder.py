@@ -8,14 +8,15 @@ import ipdb
 from tqdm import tqdm
 import pytz
 from datetime import datetime, timezone
+import os
 
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 HIDDEN_SIZE = 512
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-3
+LR = 1e-4
 
 NUM_WORKERS = 20
 
@@ -82,7 +83,7 @@ wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_
 
 wandb.define_metric("epoch")
 
-
+os.makedirs(f'./results/pos_autoencoder/{today}', exist_ok=True)
 wandb.watch(model)
 
 steps = 0
@@ -124,4 +125,4 @@ for epoch in tqdm(range(EPOCHS)):
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), f'./50_less_lr_model_pos_{today}.pth')
+torch.save(model.state_dict(), f'./50_less_bt_lr_model_pos_{today}.pth')
