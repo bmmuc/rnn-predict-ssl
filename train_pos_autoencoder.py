@@ -10,13 +10,13 @@ import pytz
 from datetime import datetime, timezone
 import os
 
-BATCH_SIZE = 1024
-HIDDEN_SIZE = 512
+BATCH_SIZE = 256
+HIDDEN_SIZE = 64
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-5
+LR = 1e-4
 
 NUM_WORKERS = 20
 
@@ -68,22 +68,27 @@ model = PositionAutoEncoder(
 
 today = datetime.now(pytz.timezone('America/Sao_Paulo')
                      ).strftime("%Y-%m-%d_%H:%M:%S")
-
+config = {
+    "batch_size": BATCH_SIZE,
+    "hidden_size": HIDDEN_SIZE,
+    "window_size": WINDOW_SIZE,
+    "input_size": INPUT_SIZE,
+    "epochs": EPOCHS,
+    "lr": LR,
+    "noise": True,
+    "horizon": HORIZON_SIZE
+}
 wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_{today}",
-           config={
-               "batch_size": BATCH_SIZE,
-               "hidden_size": HIDDEN_SIZE,
-               "window_size": WINDOW_SIZE,
-               "input_size": INPUT_SIZE,
-               "epochs": EPOCHS,
-               "lr": LR,
-               "noise": True,
-               "horizon": HORIZON_SIZE
-           })
+           config=config)
 
 wandb.define_metric("epoch")
 
 os.makedirs(f'./results/pos_autoencoder/{today}', exist_ok=True)
+# save config
+with open(f'./results/pos_autoencoder/{today}/config.txt', 'w') as f:
+    f.write(str(config))
+
+
 wandb.watch(model)
 
 steps = 0
