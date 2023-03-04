@@ -9,7 +9,7 @@ from tqdm import tqdm
 import pytz
 from datetime import datetime, timezone
 
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 HIDDEN_SIZE = 512
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
@@ -115,8 +115,10 @@ for epoch in tqdm(range(EPOCHS)):
         'loss_pos_train/epoch': general_loss / len(train_loader),
         'loss_pos_val/epoch': general_val_loss / len(val_loader),
     }
-
+    if epoch % 10 == 0:
+        torch.save(model.state_dict(),
+                   f'./results/pos_autoencoder/checkpoint_{epoch}.pth')
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), './50_model_pos.pth')
+torch.save(model.state_dict(), './50_256bt_model_pos.pth')
