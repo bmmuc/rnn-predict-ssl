@@ -11,13 +11,13 @@ from datetime import datetime, timezone
 import os
 import time
 
-BATCH_SIZE = 256
+BATCH_SIZE = 32
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-2
+LR = 1e-3
 NUM_WORKERS = 15
 
 dataset = ConcatDataSetAutoencoder(
