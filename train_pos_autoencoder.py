@@ -4,21 +4,21 @@ from torch.utils.data import DataLoader
 # from tensorboardX import SummaryWriter
 import torch
 import wandb
-import ipdb
+
 from tqdm import tqdm
 import pytz
 from datetime import datetime, timezone
 import os
+import time
 
 BATCH_SIZE = 256
-HIDDEN_SIZE = 64
+HIDDEN_SIZE = 256
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
 LR = 1e-4
-
-NUM_WORKERS = 20
+NUM_WORKERS = 15
 
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
@@ -94,6 +94,7 @@ wandb.watch(model)
 steps = 0
 epochs = 0
 for epoch in tqdm(range(EPOCHS)):
+    a = time.time()
     wandb.log({'epoch': epochs})
     general_val_loss = 0
     # print(f'Epoch: {epoch}, loss: {general_loss / total}')
@@ -124,10 +125,15 @@ for epoch in tqdm(range(EPOCHS)):
         'loss_pos_train/epoch': general_loss / len(train_loader),
         'loss_pos_val/epoch': general_val_loss / len(val_loader),
     }
-    if epoch % 10 == 0:
-        torch.save(model.state_dict(),
-                   f'./results/pos_autoencoder/{today}/checkpoint_{epoch}.pth')
+
     wandb.log(log_dict)
     epochs += 1
+    b = time.time()
+
+    print(f'Epoch: {epoch}, time: {b - a}')
+
+    if epoch % 15 == 0:
+        torch.save(model.state_dict(),
+                   f'./results/pos_autoencoder/{today}/checkpoint_{epoch}.pth')
 
 torch.save(model.state_dict(), f'./results/pos_autoencoder/{today}/final.pth')
