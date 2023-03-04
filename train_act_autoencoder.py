@@ -117,4 +117,4 @@ for epoch in tqdm(range(EPOCHS)):
     epochs += 1
 
 
-torch.save(model.state_dict(), './model_act.pth')
+torch.save(model.state_dict(), './50_model_act.pth')

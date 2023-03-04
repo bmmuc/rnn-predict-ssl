@@ -119,4 +119,4 @@ for epoch in tqdm(range(EPOCHS)):
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), './model_pos.pth')
+torch.save(model.state_dict(), './50_model_pos.pth')
