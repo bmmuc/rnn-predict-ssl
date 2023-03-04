@@ -10,13 +10,13 @@ import pytz
 from datetime import datetime, timezone
 import os
 
-BATCH_SIZE = 128
-HIDDEN_SIZE = 1024
+BATCH_SIZE = 1024
+HIDDEN_SIZE = 512
 WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-3
+LR = 1e-5
 
 NUM_WORKERS = 20
 
