@@ -17,6 +17,7 @@ INPUT_SIZE = 38
 EPOCHS = 100
 LR = 1e-4
 
+NUM_WORKERS = 20
 
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
@@ -33,7 +34,7 @@ train_loader = DataLoader(
     dataset,
     shuffle=True,
     batch_size=BATCH_SIZE,
-    num_workers=10,
+    num_workers=NUM_WORKERS,
     pin_memory=True
 )
 
@@ -51,9 +52,10 @@ dataset = ConcatDataSetAutoencoder(
 val_loader = DataLoader(
     dataset,
     batch_size=BATCH_SIZE,
-    num_workers=10,
+    num_workers=NUM_WORKERS,
     pin_memory=True
 )
+
 
 model = PositionAutoEncoder(
     window=WINDOW_SIZE,
@@ -62,6 +64,7 @@ model = PositionAutoEncoder(
     output_size=INPUT_SIZE,
     lr=LR,
 )
+
 today = datetime.now(pytz.timezone('America/Sao_Paulo')
                      ).strftime("%Y-%m-%d_%H:%M:%S")
 
