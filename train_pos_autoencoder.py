@@ -15,7 +15,7 @@ WINDOW_SIZE = 50
 HORIZON_SIZE = 1
 INPUT_SIZE = 38
 EPOCHS = 100
-LR = 1e-4
+LR = 1e-3
 
 NUM_WORKERS = 20
 
@@ -124,4 +124,4 @@ for epoch in tqdm(range(EPOCHS)):
     wandb.log(log_dict)
     epochs += 1
 
-torch.save(model.state_dict(), './50_256bt_model_pos.pth')
+torch.save(model.state_dict(), f'./50_less_lr_model_pos_{today}.pth')
