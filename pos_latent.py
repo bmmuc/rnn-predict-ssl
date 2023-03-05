@@ -71,7 +71,7 @@ class PosLatent(nn.Module):
 
         self.pred_act = nn.ModuleDict({
             # estrutura pos => (512, 1024)
-            'linear1': nn.Linear(hidden_size, 1024),
+            'linear1': nn.Linear(pos_hidden_size + hidden_size, 1024),
             # 'linear1': nn.Linear(512, 1024), # estrutura pos + act => (512, 1024)
             'linear2': nn.Linear(1024, 512),
             'linear3': nn.Linear(512, 512),
@@ -147,12 +147,13 @@ class PosLatent(nn.Module):
         return out_pred_act
 
     def predict_n_steps(self, x_hist, n_steps):
-        ipdb.set_trace()
+        # ipdb.set_trace()
         with torch.no_grad():
             x_hist = torch.FloatTensor(x_hist).to(torch.device('cuda'))
             x_hist = x_hist.view(1, x_hist.shape[0], x_hist.shape[1])
             y_hist = x_hist.clone()
-
+            # y_act = y_clone1[:, self.indexes_act].clone()
+            # y_pos = y_clone2[:, self.indexes].clone()
             y_hist_pos = y_hist[:, :, self.indexes]
             y_hist_act = y_hist[:, :, self.indexes_act]
 
@@ -257,7 +258,8 @@ class PosLatent(nn.Module):
         out = self.pred_pos['dropout3'](out)
         out_pred_pos = self.pred_pos['linear22'](out)
 
-        out2 = self.pred_act['linear1'](act_encoded)  # -> versao sem concat
+        out2 = self.pred_act['linear1'](
+            act_pos_hidden_concat)  # -> versao sem concat
         # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
         out2 = self.pred_act['linear2'](out2)
         out2 = self.pred_act['linear3'](out2)

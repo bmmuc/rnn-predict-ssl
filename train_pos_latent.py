@@ -11,17 +11,17 @@ import pytz
 import os
 
 BATCH_SIZE = 512
-HIDDEN_SIZE = 512
-POS_HIDDEN_SIZE = 512
-WINDOW_SIZE = 10
+HIDDEN_SIZE = 256
+POS_HIDDEN_SIZE = 256
+WINDOW_SIZE = 50
 INPUT_SIZE = 74
 EPOCHS = 100
 LR = 1e-6
 NUM_WORKERS = 15
 WEIGHTS = [0.9, 0.1]
 
-ACT_PATH = './model_act.pth'
-POS_PATH = './model_pos.pth'
+ACT_PATH = './model_act_50.pth'
+POS_PATH = './modelo_32_btch.pth'
 
 dataset = ConcatDataSet(
     type_of_data='train',
