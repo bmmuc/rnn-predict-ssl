@@ -10,7 +10,7 @@ from datetime import datetime
 import pytz
 import os
 
-BATCH_SIZE = 256
+BATCH_SIZE = 32
 HIDDEN_SIZE = 256
 POS_HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
