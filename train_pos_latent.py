@@ -13,15 +13,15 @@ import os
 BATCH_SIZE = 256
 HIDDEN_SIZE = 256
 POS_HIDDEN_SIZE = 256
-WINDOW_SIZE = 50
+WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR = 1e-5
-NUM_WORKERS = 20
+LR = 1e-4
+NUM_WORKERS = 2
 WEIGHTS = [0.9, 0.1]
 
-ACT_PATH = './model_act_50.pth'
-POS_PATH = './modelo_32_btch.pth'
+ACT_PATH = './model_act_10.pth'
+POS_PATH = './model_pos_10.pth'
 
 dataset = ConcatDataSet(
     type_of_data='train',

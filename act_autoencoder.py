@@ -271,10 +271,10 @@ class ActAutoEncoder(nn.Module):
         decoded = self.decoder(encoded, x)
         # decoded = decoded.view(decoded.shape[0], decoded.shape[2], decoded.shape[1])
 
-        return encoded, decoded[:,:,:]
+        return encoded, decoded[:, :, :]
         # return encoded, decoded
 
-    def encoding(self, x, is_traning = True):
+    def encoding(self, x, is_traning=True):
         # ipdb.set_trace()
         if is_traning:
             x = x[:, :, self.indexes]
@@ -309,7 +309,7 @@ class ActAutoEncoder(nn.Module):
         total_norm = 0
         # layers = []
         for p in self.parameters():
-            if(p.requires_grad):
+            if (p.requires_grad):
                 # layers.append(n)
                 ave_grads.append(torch.max(torch.abs(p.grad)).item())
                 param_norm = p.grad.data.norm(2)
@@ -335,4 +335,4 @@ class ActAutoEncoder(nn.Module):
         return general_loss
 
     def configure_optimizers(self, lr):
-        return Adam(self.parameters(), lr = lr)
+        return Adam(self.parameters(), lr=lr)

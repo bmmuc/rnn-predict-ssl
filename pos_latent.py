@@ -41,7 +41,7 @@ class PosLatent(nn.Module):
 
         self.pos_autoencoder = self.pos_autoencoder.eval()
         self.act_autoencoder = self.act_autoencoder.eval()
-
+        # ipdb.set_trace()
         self.pred_pos = nn.ModuleDict({
             'linear1': nn.Linear(pos_hidden_size + hidden_size, 1024),
             'linear2': nn.Linear(1024, 512),
@@ -322,7 +322,7 @@ class PosLatent(nn.Module):
         self.opt.zero_grad()
 
         general_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.parameters(), 0.175)
+        # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.0175)
 
         self.opt.step()
 
