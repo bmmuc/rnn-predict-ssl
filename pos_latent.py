@@ -312,11 +312,12 @@ class PosLatent(nn.Module):
 
         y_act = y_clone1[:, self.indexes_act].clone()
         y_pos = y_clone2[:, self.indexes].clone()
-
+        y_ball = y_clone2[:, :2].clone()
+        pred_ball = pred1[:, :2].clone()
         loss_act = F.mse_loss(pred2, y_act)
 
         loss_pos = F.mse_loss(pred1, y_pos)
-
+        loss_ball = F.mse_loss(pred_ball, y_ball)
         general_loss = self.weitght_pos * loss_pos + self.weitght_acts * loss_act
 
         self.opt.zero_grad()
@@ -345,6 +346,7 @@ class PosLatent(nn.Module):
                     'train/loss/loss_act': loss_act,
                     'max_abs_gradients': max(ave_grads),
                     'max_norm_gradients': max(norm_grad),
+                    'train/loss/loss_ball': loss_ball,
                     'sum_norm_gradients': total_norm,
                     # 'train/loss/general_loss_encoded': general_loss_encoded,
                     }
@@ -365,7 +367,10 @@ class PosLatent(nn.Module):
 
         y_act = y[:, self.indexes_act]
         y_pos = y[:, self.indexes]
+        y_ball = y_pos[:, :2].clone()
+        pred_ball = pred1[:, :2].clone()
 
+        loss_ball = F.mse_loss(pred_ball, y_ball)
         loss_pos = F.mse_loss(pred1, y_pos)
         loss_act = F.mse_loss(pred2, y_act)
 
@@ -417,6 +422,7 @@ class PosLatent(nn.Module):
         log_dict = {'val/loss/general_loss': general_loss,
                     'val/loss/loss_pos': loss_pos,
                     'val/loss/loss_act': loss_act,
+                    'val/loss/loss_ball': loss_ball,
                     # 'train/loss/general_loss_encoded': general_loss_encoded,
                     }
 
