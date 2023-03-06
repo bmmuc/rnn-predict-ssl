@@ -69,7 +69,7 @@ files = os.listdir(f'./results/{today}')
 
 os.makedirs(f'./results/{today}/{len(files)}/', exist_ok=True)
 
-wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"new_ds_full_model_w_grad_clip_{today}",
+wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"new_ds_full_model_w_true_grad_clip_{today}",
            config={
                "batch_size": BATCH_SIZE,
                "hidden_size": HIDDEN_SIZE,
