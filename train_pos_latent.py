@@ -10,13 +10,13 @@ from datetime import datetime
 import pytz
 import os
 
-BATCH_SIZE = 32
+BATCH_SIZE = 256
 HIDDEN_SIZE = 256
 POS_HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR = 1e-3
+LR = 1e-8
 NUM_WORKERS = 20
 WEIGHTS = [0.9, 0.1]
 
@@ -69,7 +69,7 @@ files = os.listdir(f'./results/{today}')
 
 os.makedirs(f'./results/{today}/{len(files)}/', exist_ok=True)
 
-wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"new_ds_reduced_model_w_grad_clip_more_lr_less_bt{today}",
+wandb.init(project="ssl_env_pred", entity="breno-cavalcanti", name=f"new_ds_reduced_model_w_grad_clip_less_lr_{today}",
            config={
                "batch_size": BATCH_SIZE,
                "hidden_size": HIDDEN_SIZE,
