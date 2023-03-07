@@ -49,7 +49,7 @@ class PosLatent(nn.Module):
             'linear4': nn.Linear(512, 512),
             # 'dropout1': nn.Dropout(0.5),
             'linear5': nn.Linear(512, 512),
-            'linear8': nn.Linear(512, 256),
+            'linear8': nn.Linear(512, 512),
             'linear9': nn.Linear(512, 512),
             'linear10': nn.Linear(512, 512),
             'linear11': nn.Linear(512, 512),
