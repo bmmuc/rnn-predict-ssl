@@ -10,13 +10,13 @@ from datetime import datetime
 import pytz
 import os
 
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 HIDDEN_SIZE = 256
 POS_HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 INPUT_SIZE = 74
 EPOCHS = 100
-LR = 1e-8
+LR = 1e-4
 NUM_WORKERS = 20
 WEIGHTS = [0.9, 0.1]
 
