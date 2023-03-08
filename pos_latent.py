@@ -45,14 +45,27 @@ class PosLatent(nn.Module):
         self.pred_pos = nn.ModuleDict({
             'linear1': nn.Linear(pos_hidden_size + hidden_size, 1024),
             'linear2': nn.Linear(1024, 512),
-            'linear3': nn.Linear(512, 512),
-            'linear4': nn.Linear(512, 512),
-            'linear5': nn.Linear(512, 256),
-            'linear6': nn.Linear(256, 256),
-            'linear7': nn.Linear(256, 256),
+            'linear3': nn.Linear(512, 256),
+            'linear4': nn.Linear(256, 256),
+            # 'dropout1': nn.Dropout(0.5),
+            'linear5': nn.Linear(256, 256),
             'linear8': nn.Linear(256, 256),
             'linear9': nn.Linear(256, 256),
             'linear10': nn.Linear(256, pos_hidden_size),
+            # 'linear11': nn.Linear(512, 512),
+            # # 'dropout2': nn.Dropout(0.5),
+            # 'linear12': nn.Linear(512, 512),
+            # 'linear13': nn.Linear(512, 512),
+            # 'linear14': nn.Linear(512, 512),
+            # 'linear15': nn.Linear(512, 512),
+            # 'linear16': nn.Linear(512, 512),
+            # 'linear17': nn.Linear(512, 512),
+            # 'linear18': nn.Linear(512, 512),
+            # 'linear19': nn.Linear(512, 512),
+            # 'linear20': nn.Linear(512, 512),
+            # 'linear21': nn.Linear(512, 512),
+            # # 'dropout3': nn.Dropout(0.5),
+            # 'linear22': nn.Linear(512, pos_hidden_size),
 
         })
 
@@ -246,7 +259,8 @@ class PosLatent(nn.Module):
         # out_pred_pos = self.pred_pos['linear22'](out)
 
         out2 = self.pred_act['linear1'](
-            act_pos_hidden_concat)
+            act_pos_hidden_concat)  # -> versao sem concat
+        # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
         out2 = self.pred_act['linear2'](out2)
         out2 = self.pred_act['linear3'](out2)
         out2 = self.pred_act['linear4'](out2)
