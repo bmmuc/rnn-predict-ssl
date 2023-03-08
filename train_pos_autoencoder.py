@@ -15,10 +15,10 @@ BATCH_SIZE = 32
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
-INPUT_SIZE = 38
+INPUT_SIZE = 50
 EPOCHS = 100
 LR = 1e-3
-NUM_WORKERS = 15
+NUM_WORKERS = 20
 
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
