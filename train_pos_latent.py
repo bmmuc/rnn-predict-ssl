@@ -10,7 +10,7 @@ from datetime import datetime
 import pytz
 import os
 
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 HIDDEN_SIZE = 256
 POS_HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
@@ -20,8 +20,8 @@ LR = 1e-4
 NUM_WORKERS = 20
 WEIGHTS = [0.9, 0.1]
 
-ACT_PATH = './model_act_10.pth'
-POS_PATH = './model_pos_10.pth'
+ACT_PATH = './final_act.pth'
+POS_PATH = './final_pos.pth'
 
 dataset = ConcatDataSet(
     type_of_data='train',

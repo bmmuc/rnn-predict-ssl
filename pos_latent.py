@@ -32,7 +32,7 @@ class PosLatent(nn.Module):
         self.device = device
 
         self.pos_autoencoder = PositionAutoEncoder(
-            window=window, input_size=38, hidden_size=pos_hidden_size, output_size=38)
+            window=window, input_size=50, hidden_size=pos_hidden_size, output_size=50)
         self.pos_autoencoder.load_state_dict(torch.load(pos_path))
 
         self.act_autoencoder = ActAutoEncoder(
@@ -259,8 +259,7 @@ class PosLatent(nn.Module):
         out_pred_pos = self.pred_pos['linear22'](out)
 
         out2 = self.pred_act['linear1'](
-            act_pos_hidden_concat)  # -> versao sem concat
-        # out2 = self.pred_act['linear1'](act_pos_hidden_concat)
+            act_pos_hidden_concat)
         out2 = self.pred_act['linear2'](out2)
         out2 = self.pred_act['linear3'](out2)
         out2 = self.pred_act['linear4'](out2)
