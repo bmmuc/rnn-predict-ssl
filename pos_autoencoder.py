@@ -81,7 +81,7 @@ class AttnEncoder(nn.Module):
             num_layers=1
         )
         self.attn = nn.Linear(
-            in_features= 2 * self.hidden_size + self.seq_len,
+            in_features=2 * self.hidden_size + self.seq_len,
             out_features=1
         )
         self.softmax = nn.Softmax(dim=1)
@@ -198,6 +198,7 @@ class AttnDecoder(nn.Module):
                             self.out_feats, self.out_feats)
         self.fc_out = nn.Linear(
             self.decoder_hidden_size + self.encoder_hidden_size, self.out_feats * self.seq_len)
+        self.tahn = nn.Tanh()
         self.fc.weight.data.normal_()
 
     def forward(self, input_encoded: torch.Tensor, y_history: torch.Tensor):
@@ -237,6 +238,8 @@ class AttnDecoder(nn.Module):
         # predicting value at t=self.seq_length+1
         out = self.fc_out(torch.cat((h_t[0], con.to(device)), dim=1))
         out = out.view(-1, self.seq_len, self.out_feats)
+        # adicione tahn para limitar o valor de saída
+        out = self.tahn(out)
 
         return out
 
@@ -261,13 +264,14 @@ class PositionAutoEncoder(nn.Module):
         self.window = window
 
         self.lr = lr
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
         self = self.to(torch.device('cuda'))
         self.num_of_data_to_train = num_of_data_to_train
         self.num_of_data_to_val = num_of_data_to_val
         self.automatic_optimization = False
         indexes_act = Aux.is_vel
-        #self.indexes will be not self.indexes_act
+        # self.indexes will be not self.indexes_act
         self.indexes = []
 
         for value in indexes_act:
@@ -284,9 +288,9 @@ class PositionAutoEncoder(nn.Module):
         decoded = self.decoder(encoded, x)
         # decoded = decoded.view(decoded.shape[0], decoded.shape[2], decoded.shape[1])
 
-        return encoded, decoded[:,:,:]
+        return encoded, decoded[:, :, :]
 
-    def encoding(self, x, is_traning = True):
+    def encoding(self, x, is_traning=True):
         # ipdb.set_trace()
         if is_traning:
             x = x[:, :, self.indexes]
@@ -321,7 +325,7 @@ class PositionAutoEncoder(nn.Module):
         total_norm = 0
         # layers = []
         for p in self.parameters():
-            if(p.requires_grad):
+            if (p.requires_grad):
                 # layers.append(n)
                 ave_grads.append(torch.max(torch.abs(p.grad)).item())
                 param_norm = p.grad.data.norm(2)
