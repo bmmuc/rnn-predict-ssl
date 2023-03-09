@@ -100,7 +100,7 @@ model = PositionAutoEncoder(
     output_size=INPUT_SIZE,
     lr=LR,
 )
-
+# 2023-03-07_23:00:04
 model.load_state_dict(torch.load(
     './modelo_autoencoder_pos.pth', map_location=torch.device('cpu')))
 
