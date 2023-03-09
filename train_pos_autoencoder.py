@@ -17,7 +17,7 @@ WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 50
 EPOCHS = 100
-LR = 1e-4
+LR = 1e-3
 NUM_WORKERS = 14
 
 dataset = ConcatDataSetAutoencoder(
