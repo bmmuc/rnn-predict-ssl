@@ -11,14 +11,14 @@ from datetime import datetime, timezone
 import os
 import time
 
-BATCH_SIZE = 32
+BATCH_SIZE = 2
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 50
 EPOCHS = 100
 LR = 1e-3
-NUM_WORKERS = 20
+NUM_WORKERS = 1
 
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',
@@ -78,7 +78,7 @@ config = {
     "noise": True,
     "horizon": HORIZON_SIZE
 }
-wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_{today}",
+wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_tahn_{today}",
            config=config)
 
 wandb.define_metric("epoch")
