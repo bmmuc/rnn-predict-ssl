@@ -12,7 +12,7 @@ import pytz
 BATCH_SIZE = 256
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
-INPUT_SIZE = 36
+INPUT_SIZE = 38
 EPOCHS = 100
 NUM_WORKERS = 15
 LR = 1e-4
@@ -117,4 +117,4 @@ for epoch in tqdm(range(EPOCHS)):
     epochs += 1
 
 
-torch.save(model.state_dict(), './50_model_act.pth')
+torch.save(model.state_dict(), './model_with_ball_v.pth')

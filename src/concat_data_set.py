@@ -40,9 +40,9 @@ class ConcatDataSet(Dataset):
         print(f'Loading the {self.type} data set...')
 
         self.data_windows = np.load(
-            f'datas/10/{self.type}_data_windows_full_games_reduced.npy')
+            f'datas/new_normalized/{self.type}_data_windows_full_games_reduced.npy')
         self.data_labels = np.load(
-            f'datas/10/{self.type}_data_labels_full_games_reduced.npy')
+            f'datas/new_normalized/{self.type}_data_labels_full_games_reduced.npy')
 
         print(f'Loaded the {self.type} data set')
 
