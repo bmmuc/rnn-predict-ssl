@@ -11,14 +11,14 @@ from datetime import datetime, timezone
 import os
 import time
 
-BATCH_SIZE = 2
+BATCH_SIZE = 256
 HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 50
 EPOCHS = 100
-LR = 1e-3
-NUM_WORKERS = 1
+LR = 1e-4
+NUM_WORKERS = 14
 
 dataset = ConcatDataSetAutoencoder(
     root_dir='../all_data/data-3v3-v2',

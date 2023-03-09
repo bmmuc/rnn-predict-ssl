@@ -9,6 +9,9 @@ from gym.envs.classic_control import rendering
 from typing import Dict, List, Tuple
 import pandas as pd
 import math
+import ipdb
+from src.aux_idx import Aux
+
 # COLORS RGB
 BLACK = (0 / 255, 0 / 255, 0 / 255)
 BG_GREEN = (20 / 255, 90 / 255, 45 / 255)
@@ -26,6 +29,13 @@ TAG_GREEN = (57 / 255, 220 / 255, 20 / 255)
 TAG_RED = (151 / 255, 21 / 255, 0 / 255)
 TAG_PURPLE = (102 / 255, 51 / 255, 153 / 255)
 TAG_PINK = (220 / 255, 0 / 255, 220 / 255)
+
+indexes_act = Aux.is_vel
+# self.indexes will be not self.indexes_act
+indexes = []
+
+for value in indexes_act:
+    indexes.append(not value)
 
 
 class RCGymRender:
@@ -75,39 +85,61 @@ class RCGymRender:
         self.should_render_actual_ball = should_render_actual_ball
         self.max_pos = max(6 / 2, (9 / 2)
                            + self.field.penalty_length)
-        print(6)
-        print(9)
+
         # print(self.max_pos)
         # ipdb.set_trace()
         # self.max_pos = 1.2
-        self.colums = ['ball_x', 'ball_y', 'ball_vel_x', 'ball_vel_y',
-                       'robot_yellow_1_x', 'robot_yellow_1_y', 'robot_yellow_1_orientation',
-                       'robot_yellow_1_vel_x', 'robot_yellow_1_vel_y',
-                       'robot_yellow_1_vel_angular', 'robot_blue_2_x', 'robot_blue_2_y',
-                       'robot_blue_2_orientation', 'robot_blue_2_vel_x', 'robot_blue_2_vel_y',
-                       'robot_blue_2_vel_angular', 'robot_blue_3_x', 'robot_blue_3_y',
-                       'robot_blue_3_orientation', 'robot_blue_3_vel_x', 'robot_blue_3_vel_y',
-                       'robot_blue_3_vel_angular', 'robot_yellow_4_x', 'robot_yellow_4_y',
-                       'robot_yellow_4_orientation', 'robot_yellow_4_vel_x',
-                       'robot_yellow_4_vel_y', 'robot_yellow_4_vel_angular', 'robot_blue_5_x',
-                       'robot_blue_5_y', 'robot_blue_5_orientation', 'robot_blue_5_vel_x',
-                       'robot_blue_5_vel_y', 'robot_blue_5_vel_angular', 'robot_blue_4_x',
-                       'robot_blue_4_y', 'robot_blue_4_orientation', 'robot_blue_4_vel_x',
-                       'robot_blue_4_vel_y', 'robot_blue_4_vel_angular', 'robot_yellow_5_x',
-                       'robot_yellow_5_y', 'robot_yellow_5_orientation',
-                       'robot_yellow_5_vel_x', 'robot_yellow_5_vel_y',
-                       'robot_yellow_5_vel_angular', 'robot_yellow_0_x', 'robot_yellow_0_y',
-                       'robot_yellow_0_orientation', 'robot_yellow_0_vel_x',
-                       'robot_yellow_0_vel_y', 'robot_yellow_0_vel_angular', 'robot_blue_0_x',
-                       'robot_blue_0_y', 'robot_blue_0_orientation', 'robot_blue_0_vel_x',
-                       'robot_blue_0_vel_y', 'robot_blue_0_vel_angular', 'robot_yellow_3_x',
-                       'robot_yellow_3_y', 'robot_yellow_3_orientation',
-                       'robot_yellow_3_vel_x', 'robot_yellow_3_vel_y',
-                       'robot_yellow_3_vel_angular', 'robot_blue_1_x', 'robot_blue_1_y',
-                       'robot_blue_1_orientation', 'robot_blue_1_vel_x', 'robot_blue_1_vel_y',
-                       'robot_blue_1_vel_angular', 'robot_yellow_2_x', 'robot_yellow_2_y',
-                       'robot_yellow_2_orientation', 'robot_yellow_2_vel_x',
-                       'robot_yellow_2_vel_y', 'robot_yellow_2_vel_angular']
+        self.columns = ['ball_x',
+                        'ball_y',
+                        'robot_blue_0_x',
+                        'robot_blue_0_y',
+                        'robot_blue_0_sin',
+                        'robot_blue_0_cos',
+                        'robot_blue_1_x',
+                        'robot_blue_1_y',
+                        'robot_blue_1_sin',
+                        'robot_blue_1_cos',
+                        'robot_blue_2_x',
+                        'robot_blue_2_y',
+                        'robot_blue_2_sin',
+                        'robot_blue_2_cos',
+                        'robot_blue_3_x',
+                        'robot_blue_3_y',
+                        'robot_blue_3_sin',
+                        'robot_blue_3_cos',
+                        'robot_blue_4_x',
+                        'robot_blue_4_y',
+                        'robot_blue_4_sin',
+                        'robot_blue_4_cos',
+                        'robot_blue_5_x',
+                        'robot_blue_5_y',
+                        'robot_blue_5_sin',
+                        'robot_blue_5_cos',
+                        'robot_yellow_0_x',
+                        'robot_yellow_0_y',
+                        'robot_yellow_0_sin',
+                        'robot_yellow_0_cos',
+                        'robot_yellow_1_x',
+                        'robot_yellow_1_y',
+                        'robot_yellow_1_sin',
+                        'robot_yellow_1_cos',
+                        'robot_yellow_2_x',
+                        'robot_yellow_2_y',
+                        'robot_yellow_2_sin',
+                        'robot_yellow_2_cos',
+                        'robot_yellow_3_x',
+                        'robot_yellow_3_y',
+                        'robot_yellow_3_sin',
+                        'robot_yellow_3_cos',
+                        'robot_yellow_4_x',
+                        'robot_yellow_4_y',
+                        'robot_yellow_4_sin',
+                        'robot_yellow_4_cos',
+                        'robot_yellow_5_x',
+                        'robot_yellow_5_y',
+                        'robot_yellow_5_sin',
+                        'robot_yellow_5_cos',
+                        ]
 
         # Window dimensions in pixels
         screen_width = width
@@ -163,11 +195,12 @@ class RCGymRender:
             data = data * 6
             find = 'y'
 
-        elif id_ == 'orientation':
-            data = data * math.pi
+        elif id_ == 'sin':
+            data = np.arcsin(data)
             find = 'orientation'
-        else:
-            print('não atuando em: ', colmn_name)
+
+        # else:
+        #     print('não atuando em: ', colmn_name)
         return data, find
 
     def __del__(self):
@@ -178,7 +211,9 @@ class RCGymRender:
     def render_frame(self, return_rgb_array: bool = False,
                      ball_actual_x=0.0, ball_actual_y=0.0,
                      ball_true_x=0.0, ball_true_y=0.0,
-                     preds=[]) -> None:
+                     preds=[],
+                     all_true=[],
+                     columns=[]) -> None:
         '''
         Draws the field, ball and players.
 
@@ -191,7 +226,7 @@ class RCGymRender:
         None
 
         '''
-
+        # ipdb.set_trace()
         x_pos_blue = []
         y_pos_blue = []
         theta_blue = []
@@ -199,9 +234,9 @@ class RCGymRender:
         x_pos_yellow = []
         y_pos_yellow = []
         theta_yellow = []
-
-        # ball_pred_x = preds[0]
-        # ball_pred_y = preds[1]
+        # self.columns = columns
+        ball_pred_x = preds[0]
+        ball_pred_y = preds[1]
 
         ball_actual_x, _ = self.denorm_data(ball_actual_x, 'ball_actual_x')
         ball_actual_y, _ = self.denorm_data(ball_actual_y, 'ball_actual_y')
@@ -211,14 +246,22 @@ class RCGymRender:
         # ball_actual_y = ball_actual_y
         # ball_true_x = ball_true_x
         # ball_true_y = ball_true_y
-        # ball_pred_x, _ = self.denorm_data(ball_pred_x, 'ball_pred_x')
-        # ball_pred_y, _ = self.denorm_data(ball_pred_y, 'ball_pred_y')
+        ball_pred_x, _ = self.denorm_data(ball_pred_x, 'ball_pred_x')
+        ball_pred_y, _ = self.denorm_data(ball_pred_y, 'ball_pred_y')
 
-        for i, pred in enumerate(preds):
-            col = self.colums[i + 2]
-            # ipdb.set_trace
-            if 'vel' not in col:
-                team = 'blue' if 'blue' in col else 'yellow'
+        for i, pred in enumerate(all_true[2:]):
+            col = self.columns[i + 2]
+            # ipdb.set_trace()
+            if 'vel' in col:
+                continue
+
+            team = None
+            if 'blue' in col:
+                team = 'blue'
+            elif 'yellow' in col:
+                team = 'yellow'
+
+            if team != None:
                 value = None
                 value, find = self.denorm_data(pred, col)
                 if find == 'x':
@@ -226,28 +269,31 @@ class RCGymRender:
                         x_pos_blue.append(value)
                     elif team == 'yellow':
                         x_pos_yellow.append(value)
-                    else:
-                        print('não atuando em: ', col)
+                    # else:
+                        # print('não atuando em: ', col)
+
                 elif find == 'y':
                     if team == 'blue':
                         y_pos_blue.append(value)
                     elif team == 'yellow':
                         y_pos_yellow.append(value)
-                    else:
-                        print('não atuando em: ', col)
+                    # else:
+                        # print('não atuando em: ', col)
+
                 elif find == 'orientation':
                     if team == 'blue':
                         theta_blue.append(value)
                     elif team == 'yellow':
                         theta_yellow.append(value)
-                    else:
-                        print('não atuando em: ', col)
+                    # else:
+                        # print('não atuando em: ', col)
+        # ipdb.set_trace()
 
         if (self.should_render_actual_ball):
             self.ball.set_translation(ball_actual_x, ball_actual_y)
-
+        # ipdb.set_trace()
         self.ball_future_real.set_translation(ball_true_x, ball_true_y)
-        # self.ball_future_ghost.set_translation(ball_pred_x, ball_pred_y)
+        self.ball_future_ghost.set_translation(ball_pred_x, ball_pred_y)
         # ipdb.set_trace()
         for i in range(self.n_robots_blue):
             self.blue_robots[i].set_translation(x_pos_blue[i], y_pos_blue[i])
@@ -606,7 +652,7 @@ if __name__ == '__main__':
             # print('não atuando em: ', colmn_name)
             pass
         return data
-
+    data = data[columns_to_get]
     for colmn_name in columns_to_get:
         data = normalize_data(data, colmn_name)
     data = data.values
@@ -615,7 +661,7 @@ if __name__ == '__main__':
 
     for i in range(len(data)):
         render.render_frame(
-            False, data[i][0], data[i][1], preds=data[i][2:])
+            False, data[i][0], data[i][1], preds=data[i][indexes])
         # time.sleep(1 / 120)
 
     del render
