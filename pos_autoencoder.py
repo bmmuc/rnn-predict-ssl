@@ -305,8 +305,6 @@ class PositionAutoEncoder(nn.Module):
     def training_step(self, X, y):
         self.train()
 
-        # ipdb.set_trace()
-
         _, pred = self.forward(X)
 
         pred = pred.squeeze()
@@ -320,21 +318,38 @@ class PositionAutoEncoder(nn.Module):
         # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.000175)
 
         self.opt.step()
-        ave_grads = []
-        norm_grad = []
+        ave_grads = [0]
+        norm_grad = [0]
         total_norm = 0
         # layers = []
-        for p in self.parameters():
-            if (p.requires_grad):
-                # layers.append(n)
-                ave_grads.append(torch.max(torch.abs(p.grad)).item())
-                param_norm = p.grad.data.norm(2)
-                norm_grad.append(param_norm.item())
-                total_norm += param_norm.item() ** 2
-                norm_grad.append(torch.norm(p.grad).item())
+        # for p in self.parameters():
+        #     if (p.requires_grad):
+        #         # layers.append(n)
+        #         ave_grads.append(torch.max(torch.abs(p.grad)).item())
+        #         param_norm = p.grad.data.norm(2)
+        #         norm_grad.append(param_norm.item())
+        #         total_norm += param_norm.item() ** 2
+        #         norm_grad.append(torch.norm(p.grad).item())
         total_norm = total_norm ** (1. / 2)
+        # ipdb.set_trace()
+        tolerance = 1e-6
+        indices = torch.gt(torch.abs(pred), 1 - tolerance)
 
-        return general_loss, max(ave_grads), max(norm_grad), total_norm
+        loss_without_none = 0
+        with torch.no_grad():
+            pred_copy = pred.clone()[indices]
+            y_copy = y.clone()[indices]
+
+            loss_without_none = F.mse_loss(pred_copy, y_copy)
+        # check if loss_without_none is nan
+        if loss_without_none != loss_without_none:
+            loss_without_none = 0
+
+        del pred_copy
+        del y_copy
+        del indices
+
+        return general_loss, max(ave_grads), max(norm_grad), total_norm, loss_without_none
 
     def validation_step(self, X, y):
         self.eval()

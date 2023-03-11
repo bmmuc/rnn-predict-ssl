@@ -12,7 +12,7 @@ import os
 import time
 
 BATCH_SIZE = 256
-HIDDEN_SIZE = 512
+HIDDEN_SIZE = 256
 WINDOW_SIZE = 10
 HORIZON_SIZE = 1
 INPUT_SIZE = 50
@@ -109,11 +109,13 @@ for epoch in tqdm(range(EPOCHS)):
     for x, y in tqdm(train_loader):
         x = x.to(model.device)
         y = y.to(model.device)
-        loss, ave_grads, norm_grad, total_norm = model.training_step(x, y)
+        loss, ave_grads, norm_grad, total_norm, loss_without_none = model.training_step(
+            x, y)
         steps += 1
         loss_dict = {
             'global_step': steps,
             'loss_pos_train/step': loss.item(),
+            'loss_pos_train/step_without_none': loss_without_none.item(),
         }
 
         wandb.log(loss_dict)
