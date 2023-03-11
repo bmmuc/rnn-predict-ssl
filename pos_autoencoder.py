@@ -343,7 +343,7 @@ class PositionAutoEncoder(nn.Module):
             loss_without_none = F.mse_loss(pred_copy, y_copy)
         # check if loss_without_none is nan
         if loss_without_none != loss_without_none:
-            loss_without_none = torch.tensor(0.0)
+            loss_without_none = general_loss
 
         del pred_copy
         del y_copy
