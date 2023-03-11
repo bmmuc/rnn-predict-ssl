@@ -366,4 +366,4 @@ class PositionAutoEncoder(nn.Module):
         return general_loss
 
     def configure_optimizers(self, lr):
-        return Adam(self.parameters(), lr=lr)
+        return Adam(self.parameters(), lr=lr, weight_decay=0.0001)
