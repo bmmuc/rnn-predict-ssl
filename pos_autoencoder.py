@@ -336,8 +336,8 @@ class PositionAutoEncoder(nn.Module):
         # ipdb.set_trace()
         loss_without_none = 0
 
-        pred_copy = pred[y > 1-tolerance]
-        y_copy = y[y > 1-tolerance]
+        pred_copy = pred[y > 1-tolerance].clone()
+        y_copy = y[y > 1-tolerance].clone()
 
         loss_without_none = F.mse_loss(pred_copy, y_copy)
 
