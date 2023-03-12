@@ -78,7 +78,7 @@ config = {
     "noise": True,
     "horizon": HORIZON_SIZE
 }
-wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_tahn_{today}",
+wandb.init(project="ssl_env", entity="breno-cavalcanti", name=f"pos_autoencoder_tahn_fix_loss_wounone_{today}",
            config=config)
 
 wandb.define_metric("epoch")

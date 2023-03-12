@@ -333,7 +333,7 @@ class PositionAutoEncoder(nn.Module):
         total_norm = total_norm ** (1. / 2)
         # ipdb.set_trace()
         tolerance = 1e-6
-        indices = torch.gt(pred, 1 - tolerance)
+        indices = torch.gt(y, 1 - tolerance)
 
         loss_without_none = 0
         with torch.no_grad():
