@@ -342,7 +342,7 @@ class PositionAutoEncoder(nn.Module):
         loss_without_none = F.mse_loss(pred_copy, y_copy)
 
         if not isinstance(loss_without_none.item(), float):
-            loss_without_none = general_loss
+            loss_without_none = general_loss.clone()
             general_loss.backward()
         else:
             loss_without_none.backward()
