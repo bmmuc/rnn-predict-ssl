@@ -335,12 +335,12 @@ class PositionAutoEncoder(nn.Module):
         indices = torch.gt(y, 1 - tolerance)
 
         loss_without_none = 0
-        # with torch.no_grad():
-        pred_copy = pred.clone()[indices]
-        y_copy = y.clone()[indices]
+
+        pred_copy = pred[indices]
+        y_copy = y[indices]
 
         loss_without_none = F.mse_loss(pred_copy, y_copy)
-        # check if loss_without_none is nan
+
         if loss_without_none != loss_without_none:
             loss_without_none = general_loss
             general_loss.backward()
