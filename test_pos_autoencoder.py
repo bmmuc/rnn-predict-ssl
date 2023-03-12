@@ -93,6 +93,8 @@ def normalize_data(data, colmn_name):
     return data
 
 
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 model = PositionAutoEncoder(
     window=WINDOW_SIZE,
     input_size=INPUT_SIZE,
@@ -102,7 +104,7 @@ model = PositionAutoEncoder(
 )
 # 2023-03-07_23:00:04
 model.load_state_dict(torch.load(
-    './modelo_autoencoder_pos.pth', map_location=torch.device('cpu')))
+    '/home/bmmuc/Documents/robocin/rnn/rnn-predict-ssl/autoencoder_new_tahn.pth', map_location=torch.device(device)))
 
 
 data = pd.read_csv(
@@ -158,60 +160,70 @@ for col in cols:
     else:
         mask.append(False)
 
-files = os.listdir('/home/bmmuc/Documents/robocin/new_normalized/')
+files = os.listdir(
+    '/home/bmmuc/Documents/robocin/logs-unification/reader/processed/new_normalized_tahn/')
 files = files[:10]
+# ipdb.set_trace()
 files.append('2021-06-21_10-22_OMID-vs-RobôCin-15.npy')
 inputs_ball = []
 outputs_ball = []
 
-for f in files[0]:
+for f in files:
     for i in range(2):
         data = np.load(
-            f'/home/bmmuc/Documents/robocin/new_normalized/{f}', allow_pickle=True).astype(np.float32)
+            f'/home/bmmuc/Documents/robocin/logs-unification/reader/processed/new_normalized_tahn/{f}', allow_pickle=True).astype(np.float32)
         # data = data[:, mask]
-
+        data = data[1300:]
         data = create_window(data, 10, 1)
         render = RCGymRender(6, 6, simulator='ssl')
         frames = []
         for seq, y_true in data:
-            seq2 = copy.deepcopy(seq)
-            inputs_ball.append(seq2[0, :2])
-            seq2 = torch.tensor(seq2, dtype=torch.float32).to(device)
-            seq2 = seq2.view(1, seq2.shape[0], seq2.shape[1])
-            # seq2 = torch.tensor(seq2, dtype=torch.float32).cuda()
-            pos, _ = model(seq2)
-            pos = pos.view(1, pos.shape[0], pos.shape[1])
-            pos = pos.cpu().detach().numpy()
-            # outputs_ball.append(pos[0, -1, :2])
             # print(pos[0, -1, :2])
             # ipdb.set_trace()
-            # frame = render.render_frame(True, y_true[-1, 0], y_true[-1, 1], y_true[0, 0], y_true[0, 1],
-            #                             preds=pos[0, -1, :], all_true=y_true[-1, indexes])
-            frame = render.render_frame(True, y_true[-1, 0], y_true[-1, 1], y_true[0, 0], y_true[0, 1],
-                                        preds=pos[0, -1, :], all_true=pos[:, -1, :])
+            if i == 0:
+                frame = render.render_frame(True, y_true[-1, 0], y_true[-1, 1], y_true[0, 0], y_true[0, 1],
+                                            preds=y_true[-1, :2], all_true=y_true[-1, indexes])
+            else:
+                seq2 = copy.deepcopy(seq)
+                # inputs_ball.append(seq2[0, :2])
+                seq2 = seq2[:, indexes]
+                seq2 = torch.tensor(seq2, dtype=torch.float32).to(device)
+                # ipdb.set_trace()
+                seq2 = seq2.view(1, seq2.shape[0], seq2.shape[1])
+                # seq2 = torch.tensor(seq2, dtype=torch.float32).cuda()
+                _, pos = model(seq2)
+                pos = pos[:, -1, :]
+                # outputs_ball.append(pos[0, -1, :2])
+                pos = pos.view(1, pos.shape[0], pos.shape[1])
+                pos = pos.cpu().detach().numpy()
+                # ipdb.set_trace()
+                frame = render.render_frame(True, y_true[-1, 0], y_true[-1, 1], y_true[0, 0], y_true[0, 1],
+                                            preds=pos[0, -1, :2], all_true=pos[0, -1, :])
+                del pos
+                del seq2
+
             frame = PIL.Image.fromarray(frame)
             frames.append(frame)
-            del pos
-            del seq2
-        name = 'real'
+
+        name = 'autoencoder'
 
         if i == 0:
-            name='autoencoder'
+            name = 'real'
 
         frames[0].save(
-        fp=f'./gifs/pos_autoencoder_dataset{f}_{name}.gif', 
-        format='GIF', 
-        append_images=frames[1:], 
-        save_all=True,
-        duration=40, 
-        loop=0
+            fp=f'./gifs/pos_autoencoder_dataset{f.split(".npy")[0]}_{name}.gif',
+            format='GIF',
+            append_images=frames[1:],
+            save_all=True,
+            duration=40,
+            loop=0
         )
-
+    break
 # inputs_ball = np.array(inputs_ball)
 # outputs_ball = np.array(outputs_ball)
 
-# np.save('inputs_ball.npy', inputs_ball)
-# np.save('outputs_ball.npy', outputs_ball)
+# np.save('inputs_ball_autoencoder.npy', inputs_ball)
+# np.save('outputs_ball.npy_autoencoder', outputs_ball)
 
 del render
 # fig, (ax1, ax2, ax3, ax4) = plt.subplots(ncols=4, figsize=(10, 5))
