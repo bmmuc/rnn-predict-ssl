@@ -334,7 +334,6 @@ class PositionAutoEncoder(nn.Module):
         tolerance = 1e-6
         indices = torch.gt(y, 1 - tolerance)
         # ipdb.set_trace()
-        loss_without_none = 0
 
         pred_copy = pred[y > 1-tolerance].clone()
         y_copy = y[y > 1-tolerance].clone()
@@ -342,9 +341,11 @@ class PositionAutoEncoder(nn.Module):
         loss_without_none = F.mse_loss(pred_copy, y_copy)
 
         if not isinstance(loss_without_none.item(), float):
+            print('erro aqui')
             loss_without_none = general_loss.clone()
             general_loss.backward()
         else:
+            print('erro aqui 2')
             loss_without_none.backward()
 
         del pred_copy
