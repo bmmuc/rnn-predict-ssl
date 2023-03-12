@@ -313,6 +313,7 @@ class PositionAutoEncoder(nn.Module):
         general_loss = F.mse_loss(pred, y)
 
         self.opt.zero_grad()
+        general_loss.backward()
 
         # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.000175)
 
@@ -333,27 +334,20 @@ class PositionAutoEncoder(nn.Module):
         # ipdb.set_trace()
         tolerance = 1e-6
         indices = torch.gt(y, 1 - tolerance)
-        # ipdb.set_trace()
 
-        pred_copy = pred[y > 1-tolerance].clone()
-        y_copy = y[y > 1-tolerance].clone()
+        loss_without_none = 0
+        with torch.no_grad():
+            pred_copy = pred.clone()[indices]
+            y_copy = y.clone()[indices]
 
-        loss_without_none = F.mse_loss(pred_copy, y_copy)
+            loss_without_none = F.mse_loss(pred_copy, y_copy)
+        # check if loss_without_none is nan
+        if loss_without_none != loss_without_none:
+            loss_without_none = general_loss
 
-        if not isinstance(loss_without_none.item(), float):
-            print('erro aqui')
-            loss_without_none = general_loss.clone()
-            general_loss.backward()
-        else:
-            print('erro aqui 2')
-            print(loss_without_none)
-            print(pred_copy)
-            print(y_copy)
-            loss_without_none.backward()
-
-        # del pred_copy
-        # del y_copy
-        # del indices
+        del pred_copy
+        del y_copy
+        del indices
 
         return general_loss, max(ave_grads), max(norm_grad), total_norm, loss_without_none
 
