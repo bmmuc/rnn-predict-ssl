@@ -348,9 +348,9 @@ class PositionAutoEncoder(nn.Module):
             print('erro aqui 2')
             loss_without_none.backward()
 
-        del pred_copy
-        del y_copy
-        del indices
+        # del pred_copy
+        # del y_copy
+        # del indices
 
         return general_loss, max(ave_grads), max(norm_grad), total_norm, loss_without_none
 
