@@ -346,6 +346,9 @@ class PositionAutoEncoder(nn.Module):
             general_loss.backward()
         else:
             print('erro aqui 2')
+            print(loss_without_none)
+            print(pred_copy)
+            print(y_copy)
             loss_without_none.backward()
 
         # del pred_copy
