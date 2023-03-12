@@ -313,7 +313,6 @@ class PositionAutoEncoder(nn.Module):
         general_loss = F.mse_loss(pred, y)
 
         self.opt.zero_grad()
-        general_loss.backward()
 
         # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.000175)
 
@@ -344,6 +343,9 @@ class PositionAutoEncoder(nn.Module):
         # check if loss_without_none is nan
         if loss_without_none != loss_without_none:
             loss_without_none = general_loss
+            general_loss.backward()
+        else:
+            loss_without_none.backward()
 
         del pred_copy
         del y_copy
