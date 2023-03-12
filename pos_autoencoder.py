@@ -333,15 +333,15 @@ class PositionAutoEncoder(nn.Module):
         # ipdb.set_trace()
         tolerance = 1e-6
         indices = torch.gt(y, 1 - tolerance)
-
+        ipdb.set_trace()
         loss_without_none = 0
 
-        pred_copy = pred[indices]
-        y_copy = y[indices]
+        pred_copy = pred[y > 1-tolerance]
+        y_copy = y[y > 1-tolerance]
 
         loss_without_none = F.mse_loss(pred_copy, y_copy)
 
-        if isinstance(loss_without_none.item(), float):
+        if not isinstance(loss_without_none.item(), float):
             loss_without_none = general_loss
             general_loss.backward()
         else:
